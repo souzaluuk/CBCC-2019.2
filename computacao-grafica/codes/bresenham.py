@@ -11,7 +11,7 @@ from classes import Ponto, Reta
 p1 = Ponto(5,5)
 p2 = Ponto(0,0)
 
-reta = Reta(p1,p2)
+reta = Reta(p1.cartesiano,p2.cartesiano)
 print('p1:',p1.cartesiano)
 print('p2:',p2.cartesiano)
 print()
