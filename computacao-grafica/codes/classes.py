@@ -17,9 +17,9 @@ class Ponto:
 class Reta:
     '''Classe que representa uma reta'''
     trocax = trocay = trocaxy = False # usados nas reflexões
-    def __init__(self,ponto_a,ponto_b):
-        self.ponto_a=ponto_a
-        self.ponto_b=ponto_b
+    def __init__(self,ponto_a,ponto_b): # receber tuplas
+        self.ponto_a=Ponto(ponto_a[0],ponto_a[1])
+        self.ponto_b=Ponto(ponto_b[0],ponto_b[1])
     @property
     def deltax(self):
         '''Retorna a variação de xa e xb'''
@@ -34,6 +34,10 @@ class Reta:
     def m(self):
         '''Retorna a divisão de delta y por delta x'''
         return self.deltay/self.deltax if self.deltax!=0 else self.deltay
+    @property
+    def cartesiano(self):
+        return list(map(lambda ponto: ponto.cartesiano,
+                    self.bresenham))
     @property
     def bresenham(self):
         '''Utilizando a lógica do algoritmo de bresenham e retorna uma lista com os Pontos que compõem o objeto reta'''
@@ -88,3 +92,11 @@ class Reta:
             if self.trocax: ponto.x = -ponto.x
             if self.trocaxy: ponto.x,ponto.y = ponto.y,ponto.x
         self.trocay = self.trocax = self.trocaxy = False
+
+#class Poligono:
+    #def __init__(self,pontos*,fechado=True):
+        #self.pontos = pontos # lista de tuplas
+    #@property
+    #def retas(self):
+        #retas = []
+        
