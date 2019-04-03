@@ -74,7 +74,7 @@ class Reta:
             p1.y = -p1.y
             p2.y = -p2.y
             self.trocay = True
-    
+
     def _reflexao(self,p1,p2,lista_pontos):
         '''Objetiva 'mover' a reta para de volta ao local de origem'''
         if self.trocay:
@@ -86,17 +86,26 @@ class Reta:
         if self.trocaxy:
             p1.x,p1.y = p1.y,p1.x
             p2.x,p2.y = p2.y,p2.x
-        
+
         for ponto in lista_pontos: # troca para os pontos da lista
             if self.trocay: ponto.y = -ponto.y
             if self.trocax: ponto.x = -ponto.x
             if self.trocaxy: ponto.x,ponto.y = ponto.y,ponto.x
         self.trocay = self.trocax = self.trocaxy = False
 
-#class Poligono:
-    #def __init__(self,pontos*,fechado=True):
-        #self.pontos = pontos # lista de tuplas
-    #@property
-    #def retas(self):
-        #retas = []
-        
+class Poligono:
+        def __init__(self,*coordenada,fechado=True): # coordenadas devem ser tuplas que representem cada vértice
+            self.len_coordenada = len(coordenada)
+            assert self.len_coordenada > 2 # apenas mais de 2 coordenada
+            self.coordenada = coordenada
+        @property
+        def retas(self):
+            reta = []
+            for x in range(self.len_coordenada-1):
+                x1,y1 = self.coordenada[x]
+                x2,y2 = self.coordenada[x+1]
+                reta.append(Reta((x1,y1),(x2,y2)))
+            x1,y1 = self.coordenada[-1]
+            x2,y2 = self.coordenada[0]
+            reta.append(Reta((x1,y1),(x2,y2)))
+            return reta

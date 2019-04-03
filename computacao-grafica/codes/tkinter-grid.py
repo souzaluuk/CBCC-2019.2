@@ -64,23 +64,16 @@ def main():
     tela.bind('<Motion>',motion_mouse)
     tela.bind('<Leave>',leave_mouse)
     tela.bind('<ButtonPress>',press_mouse)
-    
-    from classes import Ponto, Reta
-    
-    retas = [
-        Reta((1,1),(1,30)),
-        Reta((1,30),(30,30)),
-        Reta((30,30),(30,1)),
-        Reta((30,1),(1,1))
-        ]
-    
+
+    from classes import Poligono
+    quadrado = Poligono((1,1),(1,15),(15,15),(15,1))
+
     def pinta_reta(reta):
         for ponto in reta.cartesiano:
             x,y = ponto
             pinta_pixel(tela,x,y,escala)
-    
-    for reta in retas: pinta_reta(reta)
-    
+
+    for reta in quadrado.retas: pinta_reta(reta)
     janela.mainloop()
 
 main()
