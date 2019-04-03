@@ -31,7 +31,7 @@ def xyscala(x,y,escala):
     return x,y
 
 def main():
-    escala = 10
+    escala = 5
     width = 500
     height = 500
 
@@ -66,14 +66,17 @@ def main():
     tela.bind('<ButtonPress>',press_mouse)
 
     from classes import Poligono
-    quadrado = Poligono((1,1),(1,15),(15,15),(15,1))
+    triangulo1 = Poligono((24,7),(19,17),(8,17),(18,24),(9,34),(24,28),(39,34),(30,24),(40,17),(29,17))
 
     def pinta_reta(reta):
         for ponto in reta.cartesiano:
             x,y = ponto
             pinta_pixel(tela,x,y,escala)
 
-    for reta in quadrado.retas: pinta_reta(reta)
+    retas = triangulo1.retas
+
+    for reta in retas: pinta_reta(reta)
+
     janela.mainloop()
 
 main()

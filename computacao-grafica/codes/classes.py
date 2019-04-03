@@ -96,7 +96,7 @@ class Reta:
 class Poligono:
         def __init__(self,*coordenada,fechado=True): # coordenadas devem ser tuplas que representem cada vértice
             self.len_coordenada = len(coordenada)
-            assert self.len_coordenada > 2 # apenas mais de 2 coordenada
+            #assert self.len_coordenada > 2 # apenas mais de 2 coordenada
             self.coordenada = coordenada
         @property
         def retas(self):
