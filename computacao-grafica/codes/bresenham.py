@@ -1,19 +1,12 @@
 # implementação do algoritmo de bresenham
-from classes import Ponto, Reta
+from figuras import Pixel, Reta
 
-#primeiro caso
-#p1 = Ponto(0,3)
-#p2 = Ponto(3,9)
-#segundo caso
-#p1 = Ponto(0,0)
-#p2 = Ponto(5,3)
-#terceiro caso
-p1 = Ponto(5,5)
-p2 = Ponto(0,0)
+p1 = Pixel(0,0)
+p2 = Pixel(10,1)
 
-reta = Reta(p1.cartesiano,p2.cartesiano)
-print('p1:',p1.cartesiano)
-print('p2:',p2.cartesiano)
+reta = Reta(p1.get[:-1],p2.get[:-1])
+print('p1:',p1)
+print('p2:',p2)
 print()
 print('delta x:',reta.deltax) # 0-3
 print('delta y:',reta.deltay) # 9-3
@@ -21,5 +14,9 @@ print('m:',reta.m) # deltay/deltax
 print()
 print('composição da reta(bresenham):')
 
-for ponto in reta.bresenham:
-    print(ponto.cartesiano)
+for pixel in reta.bresenham:
+    print(pixel)
+
+print()
+print(reta.pixel_a)
+print(reta.pixel_b)

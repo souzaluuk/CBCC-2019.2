@@ -31,7 +31,7 @@ def xyscala(x,y,escala):
     return x,y
 
 def main():
-    escala = 5
+    escala = 10
     width = 500
     height = 500
 
@@ -48,7 +48,7 @@ def main():
     tela = cria_canvas(frame_pixels,width,height,escala)
 
     label_ponto = Label(frame_infos,text='(x,y)')
-    label_ponto.pack()
+    #label_ponto.pack()
 
     def motion_mouse(event):
         x,y = xyscala(event.x,event.y,escala)
@@ -65,18 +65,11 @@ def main():
     tela.bind('<Leave>',leave_mouse)
     tela.bind('<ButtonPress>',press_mouse)
 
-    from classes import Poligono
-    triangulo1 = Poligono((24,7),(19,17),(8,17),(18,24),(9,34),(24,28),(39,34),(30,24),(40,17),(29,17))
+    from figuras import Poligono
 
-    def pinta_reta(reta):
-        for ponto in reta.cartesiano:
-            x,y = ponto
-            pinta_pixel(tela,x,y,escala)
-
-    retas = triangulo1.retas
-
-    for reta in retas: pinta_reta(reta)
-
+    quadrado = Poligono((0,0),fechado=True)
+    for pixel in quadrado.pixels:
+        pinta_pixel(tela,pixel.x,pixel.y,escala)
     janela.mainloop()
 
 main()
