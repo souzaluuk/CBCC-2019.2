@@ -1,5 +1,8 @@
 from tkinter import *
 
+print('adaptar às mudanças')
+exit()
+
 def cria_canvas(pai, width, height, escala):
     tela = Canvas(
             pai,
