@@ -1,5 +1,4 @@
-# módulo de aplicação dos arlgoritmos da disciplina de Computação Gráfica
-from formas import Pixel, Reta
+trocaxy = trocax = trocay = False # flags de troca para bresenham
 
 def calcula_m(p1:tuple,p2:tuple):
     '''Retorna a divisão de delta y por delta x'''
@@ -11,102 +10,61 @@ def calcula_m(p1:tuple,p2:tuple):
 
 def reflexao(p1:tuple,p2:tuple):
     '''Objetiva 'mover' a reta para o primeiro octante'''
+    global trocax, trocay, trocaxy
     valor_m = calcula_m(p1,p2) # guarda o valor de 'm'
-    if  > 1 or m < -1:
-            p1.x,p1.y = p1.y,p1.x # troca 'x' com 'y'
-            p2.x,p2.y = p2.y,p2.x # troca 'x' com 'y'
-            self.trocaxy = True
-        if p1.x > p2.x:
-            p1.x = -p1.x
-            p2.x = -p2.x
-            self.trocax = True
-        if p1.y > p2.y:
-            p1.y = -p1.y
-            p2.y = -p2.y
-            self.trocay = True
+    # converte para objetos pixels para que possa realizar trocas
+    x1,y1 = p1 # instância pixel1
+    x2,y2 = p2 # instância pixel2
+    if  valor_m > 1 or valor_m < -1:
+        x1,y1 = y1,x1 # troca 'x' com 'y'
+        x2,y2 = y2,x2 # troca 'x' com 'y'
+        trocaxy = True # ativa flag de troca para xy
+    if x1 > x2:
+        x1 = -x1 # inverte x de p1
+        x2 = -x2 # inverte x de p2
+        trocax = True # ativa flag de troca para x
+    if y1 > y2:
+        y1 = -y1 # inverte y de p1
+        y2 = -y2 # inverte y de p2
+        trocay = True # ativa flag de troca para y
+    return (x1,y1),(x2,y2)
 
-    def _reflexao(self,p1,p2,lista_pixels):
-        Objetiva 'mover' a reta para de volta ao local de origem
-        for pixel in lista_pixels: # troca para os pixels da lista
-            if self.trocay:
-                pixel.y = -pixel.y
-            if self.trocax:
-                pixel.x = -pixel.x
-            if self.trocaxy:
-                pixel.x,pixel.y = pixel.y,pixel.x
-        self.trocay = self.trocax = self.trocaxy = Falses
+def _reflexao(lista_pixels):
+    '''Objetiva 'mover' a reta para de volta ao local de origem'''
+    global trocax, trocay, trocaxy
+    for i in range(len(lista_pixels)): # troca para os pixels da lista
+        x,y = lista_pixels[i]
+        if trocay:
+            y = -y
+        if trocax:
+            x = -x
+        if trocaxy:
+            x,y = y,x
+        lista_pixels[i] = (x,y)
+        trocay = trocax = trocaxy = False
 
-def bresenham(pixel_a:Pixel,pixel_b:Pixel):
+def bresenham(pixel_a:tuple,pixel_b:tuple):
     '''Utilizando o algoritmo de bresenham e retorna uma lista com os pixels que compõem o objeto reta'''
-    p1 = pixel_a.get[0][:-1] # ignora cor
-    p2 = pixel_b.get[0][:-1] # ignora cor
 
-    p1,p2 = reflexao(p1,p2) # retorna reflexão
+    p1,p2 = reflexao(pixel_a,pixel_b) # retorna reflexão
 
+    m = calcula_m(p1,p2) # guarda o cálculo de (x2-x1)/(y2-y1)
     x1,y1 = p1
     x2,y2 = p2
 
-    return [(x1,y1),(x2,y2)]
+    pixels = list() # lista de pixels que será retornada
+    e = m - 0.5 # primeiro valor de 'e'
 
-p1 = Pixel(0,0)
-p2 = Pixel(5,5)
+    pixels.append(p1)
+    while x1 < x2:
+        if e >= 0:
+            y1 += 1
+            e -= 1
+        x1 += 1
+        e += m
+        pixels.append((x1,y1))
+    _reflexao(pixels)
 
-print(bresenham(p1,p2))
+    return pixels
 
-exit()
-'''    reflexao(p1,p2) # realiza reflexão
-    pixels = [] # inicializa lista de pixels
-
-    m = self.m # guarda o valor de 'm'
-
-    xa,ya = p1
-        e = m - 0.5 # primeiro valor de 'e'
-        xa,ya = self.pixel_a.get[:-1] # retorna (x,y)
-        xb,yb = self.pixel_b.get[:-1] # retorna (x,y)
-        pixels.append(self.pixel_a)
-        while xa < xb-1:
-            if e >= 0:
-                ya += 1
-                e -= 1
-            xa += 1
-            e += m
-            pixels.append(Pixel(xa,ya,self.cor_reta))
-        pixels.append(self.pixel_b)
-        self._reflexao(self.pixel_a,self.pixel_b,pixels) # inversa da reflexão
-        return pixels
-
-    def deltax(self):
-        Retorna a variação de xa e xb
-        xa,xb = self.pixel_a.x, self.pixel_b.x
-        return xb-xa
-    @property
-    def deltay(self):
-        Retorna a variação de ya e yb
-        ya,yb = self.pixel_a.y, self.pixel_b.y
-        return yb-ya
-    @property
-    def m(self):
-        Retorna a divisão de delta y por delta x
-        return self.deltay/self.deltax if self.deltax!=0 else self.deltay
-    @property
-    def bresenham(self):
-        Utilizando o algoritmo de bresenham e retorna uma lista com os pixels que compõem o objeto reta
-        self.reflexao(self.pixel_a,self.pixel_b) # realiza reflexão
-        pixels = []
-        m = self.m # guarda o valor de 'm'
-        e = m - 0.5 # primeiro valor de 'e'
-        xa,ya = self.pixel_a.get[:-1] # retorna (x,y)
-        xb,yb = self.pixel_b.get[:-1] # retorna (x,y)
-        pixels.append(self.pixel_a)
-        while xa < xb-1:
-            if e >= 0:
-                ya += 1
-                e -= 1
-            xa += 1
-            e += m
-            pixels.append(Pixel(xa,ya,self.cor_reta))
-        pixels.append(self.pixel_b)
-        self._reflexao(self.pixel_a,self.pixel_b,pixels) # inversa da reflexão
-        return pixels
-
-'''
+print(bresenham((0,3),(3,9)))
