@@ -1,7 +1,8 @@
 from tkinter import *
-
-print('adaptar às mudanças')
-exit()
+#
+#No manjaro, necessário usar:
+# `pacman -S tk`
+#
 
 def cria_canvas(pai, width, height, escala):
     tela = Canvas(
@@ -34,7 +35,7 @@ def xyscala(x,y,escala):
     return x,y
 
 def main():
-    escala = 10
+    escala = 20
     width = 500
     height = 500
 
@@ -68,11 +69,6 @@ def main():
     tela.bind('<Leave>',leave_mouse)
     tela.bind('<ButtonPress>',press_mouse)
 
-    from figuras import Poligono
-
-    quadrado = Poligono((0,0),fechado=True)
-    for pixel in quadrado.pixels:
-        pinta_pixel(tela,pixel.x,pixel.y,escala)
     janela.mainloop()
 
 main()
