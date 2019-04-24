@@ -10,7 +10,7 @@ class Elemento:
         else:
             raise Exception('Implemente o método __init__ (construtor)')
     @property
-    def get(self):
+         get(self):
         '''Implementar este módulo em todos os objetos filhos para retorno de lista de pixles'''
         raise Exception('Implemente o método get')
 
@@ -59,3 +59,11 @@ class Poligono(Elemento):
         if self.fechado:
             pixels.append(pixels[0])
         return pixels
+
+class FramerBuffer:
+    def __init__(self,elemetos=[]):
+        self.elementos = []
+    def add(self,elemento):
+        self.elementos.append(elemento)
+    def get(self):
+        return self.elementos

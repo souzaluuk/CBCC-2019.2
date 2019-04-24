@@ -64,3 +64,5 @@ def bresenham(pixel_a:tuple,pixel_b:tuple):
         pixels.append((x1,y1))
     _reflexao(pixels,trocaxy,trocax,trocay)
     return pixels
+
+print(bresenham((0,0),(5,5)))
