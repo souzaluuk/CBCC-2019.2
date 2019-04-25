@@ -55,14 +55,13 @@ def bresenham(pixel_a:tuple,pixel_b:tuple):
     e = m - 0.5 # primeiro valor de 'e'
 
     pixels.append(p1)
-    while x1 < x2:
+    while x1 < x2-1:
         if e >= 0:
             y1 += 1
             e -= 1
         x1 += 1
         e += m
         pixels.append((x1,y1))
+    pixels.append(p2)
     _reflexao(pixels,trocaxy,trocax,trocay)
     return pixels
-
-print(bresenham((0,0),(5,5)))
