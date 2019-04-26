@@ -1,3 +1,26 @@
+def curva(controlPT):
+    n = len(controlPT)
+    pts = [None] * (n + 1)
+    for i in range(0, n):
+        pts[i] = controlPT[i]
+    def mult(p:tuple,n:float):
+        x,y = p
+        return (x*n,y*n)
+    def soma(p1,p2):
+        x1,y1 = p1
+        x2,y2 = p2
+        return (x1+x2,y1+y2)
+    coord = []
+    t=0
+    while t<1:
+        for r in range(1, n+1):
+            for i in range(0, n-r):
+                pts[i] = soma(mult(pts[i],(1-t)),mult(pts[i+1],t))
+        xfim,yfim = pts[0]
+        coord.append((round(xfim),round(yfim)))
+        t+=0.001
+    return coord
+
 def circulo(ponto_centro:tuple,ponto_raio:tuple):
     x1,y1 = ponto_centro # centro do circulo
     x2,y2 = ponto_raio # ponto que será base para o raio
