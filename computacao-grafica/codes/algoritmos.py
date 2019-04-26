@@ -1,4 +1,4 @@
-def curva(controlPT):
+def curva(controlPT,passo):
     n = len(controlPT)
     pts = [None] * (n + 1)
     for i in range(0, n):
@@ -18,7 +18,7 @@ def curva(controlPT):
                 pts[i] = soma(mult(pts[i],(1-t)),mult(pts[i+1],t))
         xfim,yfim = pts[0]
         coord.append((round(xfim),round(yfim)))
-        t+=0.001
+        t+=passo
     return coord
 
 def circulo(ponto_centro:tuple,ponto_raio:tuple):

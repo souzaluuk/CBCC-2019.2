@@ -8,7 +8,7 @@ from algoritmos import bresenham, circulo, curva
 class App(tk.Tk):
     w_bt = 6
     frame_buffer_aux = []
-    def __init__(self, escala=10, largura=600, altura=600, titulo='CG-2019.2'):
+    def __init__(self, escala=5, largura=600, altura=600, titulo='CG-2019.2'):
         super().__init__()
         # MODOS = LIVRE, LINHA, CIRCULO, CURVA, PREE_REC, PREE_SCAN
         self.title(titulo)
@@ -87,7 +87,7 @@ class App(tk.Tk):
                 self.frame_buffer_aux.append((x,y))
                 if len(self.frame_buffer_aux)==4:
                     print('buffer:',self.frame_buffer_aux)
-                    self.frame_buffer_aux = curva(self.frame_buffer_aux)
+                    self.frame_buffer_aux = curva(self.frame_buffer_aux,0.0005)
                     for x,y in self.frame_buffer_aux:
                         self.add_frame_buffer(x,y,self.cor)
                     self.pinta_buffer(self.frame_buffer_aux) # sempre após o add_frame_buffer
@@ -180,6 +180,6 @@ class App(tk.Tk):
         y //= self.escala
         return x,y
 
-app = App(escala=20)
+app = App(escala=10)
 app.show()
 exit()
