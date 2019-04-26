@@ -25,12 +25,11 @@ class App(tk.Tk):
         # inicializa frame buffer
         self.frame_buffer = [['white' for x in range(self.largura//self.escala)] for y in range(self.altura//self.escala)]
         self.frame_buffer_aux = []
-        self.pinta_buffer()
+        self.pinta_buffer([(x,y) for x in range(self.largura//self.escala) for y in range(self.altura//self.escala)])
 
     def show(self):
         self.canvas = self.cria_canvas() # cria canvas na tela do app
-        self.limpa_buffer()
-        self.pinta_buffer() # após a criação do canvas
+        self.limpa_buffer() # inicializa frame_buffer
         self.cria_eventos() # criação dos eventos de botões e cliques no canvas
         self.ferramentas = self.cria_ferramentas() # cria caixa de ferramentas na tela do app
         self.geometry("%dx%d+0+0" % (self.largura+int(self.largura*0.13), self.altura)) # dimensões totais da 
@@ -44,8 +43,8 @@ class App(tk.Tk):
         if modo=='LIVRE':
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
-                self.add_frame_buffer(x,y,self.cor)
-                self.pinta_buffer()
+                self.add_frame_buffer(x,y,self.cor) # adiciona cor no pixel indicado
+                self.pinta_buffer([(x,y)]) # pinta diretamente o pixel
             f_event = f
         elif modo=='LINHA':
             # pintando linha a cada novo clique ( para finalizar uma linha)
@@ -60,7 +59,7 @@ class App(tk.Tk):
                 else: # se buffer auxiliar vazio
                     self.frame_buffer_aux.append((x,y))
                     self.add_frame_buffer(x,y,self.cor)
-                self.pinta_buffer()
+                self.pinta_buffer(self.frame_buffer_aux)
             f_event = f
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
@@ -83,7 +82,7 @@ class App(tk.Tk):
         self.canvas.bind('<Leave>',leave_mouse)
         #self.canvas.bind('<Button-1>',self.clica_canvas)
         # instância do label que muda a cor
-        label_cor = tk.Label(frame_ferramenta,text='      ',bg=self.cor)
+        label_cor = tk.Label(frame_ferramenta,bg=self.cor,width=self.w_bt)
         # evento para mudança de cor
         def muda_cor(event):
             _,hex = askcolor(color=self.cor) # método nativo da lib tkinter
@@ -123,25 +122,26 @@ class App(tk.Tk):
         largura = self.largura
         altura = self.altura
         # instância do canvas
-        canvas = tk.Canvas(self,width=largura,height=altura)
+        canvas = tk.Canvas(self,width=largura-2,height=altura)
         canvas.grid(row=0)
         return canvas
 
     def add_frame_buffer(self,x,y,cor):
         self.frame_buffer[x][y] = cor
 
-    def pinta_buffer(self):
-        escala = self.escala # cópia local
-        for i_linha in range(len(self.frame_buffer)):
-            for i_coluna in range(len(self.frame_buffer[i_linha])):
-                cor = self.frame_buffer[i_linha][i_coluna]
-                x = i_linha*escala
-                y = i_coluna*escala
-                xfim = x+escala
-                yfim = y+escala
-                self.canvas.create_rectangle(
-                    x+1,y+1,xfim-1,yfim-1,fill=cor,outline=cor
-                )
+    def pinta_buffer(self,coord):
+        # exemplo de coord [(x0,y0),(x1,y1),...,(xn,yn)]
+        escala = self.escala
+        for pixel in coord:
+            x,y = pixel
+            cor = self.frame_buffer[x][y]
+            x = x*escala
+            y = y*escala
+            xfim = x+escala
+            yfim = y+escala
+            self.canvas.create_rectangle(
+                x+1,y+1,xfim-1,yfim-1,fill=cor,outline=cor
+            )
     
     def xyscala(self,x,y):
         x //= self.escala
