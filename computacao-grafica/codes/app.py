@@ -85,8 +85,8 @@ class App(tk.Tk):
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
                 self.frame_buffer_aux.append((x,y))
-                if len(self.frame_buffer_aux)==4:
-                    print('buffer:',self.frame_buffer_aux)
+                if len(self.frame_buffer_aux)>1 and self.frame_buffer_aux[-2]==self.frame_buffer_aux[-1]:
+                    self.frame_buffer_aux.pop(-1)
                     self.frame_buffer_aux = curva(self.frame_buffer_aux,0.0005)
                     for x,y in self.frame_buffer_aux:
                         self.add_frame_buffer(x,y,self.cor)
