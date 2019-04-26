@@ -1,3 +1,30 @@
+def circulo(ponto_centro:tuple,ponto_raio:tuple):
+    x1,y1 = ponto_centro # centro do circulo
+    x2,y2 = ponto_raio # ponto que será base para o raio
+    raio = round(((x2-x1)**2 + (y2-y1)**2)**0.5) # arrendondamento da distância entre os dois pontos
+    coords = [] # lista para guardar as coordenadas iniciais
+    x,y = (0,raio) # ponto de partida na construção o círculo (deslocado para o centro)
+    p = 1 - raio
+    coords.append((x,y))
+    while x<y:
+        x+=1
+        if p<0:
+            p+=2*x+3
+        else:
+            y-=1
+            p+=2*x-2*y+5
+        coords.append((x,y))
+    # realização das reflexões para os demais octantes
+    coords_fim=coords[:] # cópia das coordenadas do primeiro octante
+    coords_fim.extend([(y,x) for x,y in coords])
+    coords_fim.extend([(y,-x) for x,y in coords])
+    coords_fim.extend([(x,-y) for x,y in coords])
+    coords_fim.extend([(-x,-y) for x,y in coords])
+    coords_fim.extend([(-y,-x) for x,y in coords])
+    coords_fim.extend([(-y,x) for x,y in coords])
+    coords_fim.extend([(-x,y) for x,y in coords])
+    coords_fim=[(x+x1,y+y1) for x,y in coords_fim] # desloca de volta para o ponto de origem
+    return coords_fim
 
 def bresenham(pixel_a:tuple,pixel_b:tuple):
     '''Utilizando o algoritmo de bresenham e retorna uma lista com os pixels(tuplas) que compõem uma reta'''

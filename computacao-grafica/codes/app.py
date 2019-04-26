@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
-from algoritmos import bresenham
+from algoritmos import bresenham, circulo
 #
 #No manjaro, necessário usar:
 # `pacman -S tk`
@@ -61,6 +61,26 @@ class App(tk.Tk):
                     self.add_frame_buffer(x,y,self.cor)
                 self.pinta_buffer(self.frame_buffer_aux)
             f_event = f
+        elif modo=='CIRCULO':
+            # pintando linha a cada novo clique ( para finalizar uma linha)
+            # para finalização de uma linha deve-se mudar o modo de pintura, ou clicar em linha novamente
+            def f(event):
+                x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
+                if self.frame_buffer_aux: # caso haja algo no buffer auxiliar
+                    x0,y0 = self.frame_buffer_aux[-1]
+                    self.frame_buffer_aux = list(
+                        filter(
+                            lambda p: self.largura//self.escala>p[0]>=0<=p[1]<self.altura//self.escala,
+                            circulo((x0,y0),(x,y))
+                        )
+                    )
+                    for x,y in self.frame_buffer_aux:
+                        self.add_frame_buffer(x,y,self.cor)
+                    self.pinta_buffer(self.frame_buffer_aux)
+                    self.frame_buffer_aux=[]
+                else: # se buffer auxiliar vazio
+                    self.frame_buffer_aux.append((x,y)) # armazena a posição do raio
+            f_event = f
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
@@ -109,7 +129,7 @@ class App(tk.Tk):
             tk.Button(pai,text='Limpar',command=self.limpa_buffer,width=w_bt),
             tk.Button(pai,text='Livre',command=lambda: self.muda_opcao('LIVRE'),width=w_bt),
             tk.Button(pai,text='Linha',command=lambda: self.muda_opcao('LINHA'),width=w_bt),
-            tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('circulo'),width=w_bt),
+            tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt),
             tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('bezier'),width=w_bt),
             tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('scanline'),width=w_bt),
             tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('recursivo'),width=w_bt),
