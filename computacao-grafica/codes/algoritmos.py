@@ -1,3 +1,18 @@
+def preenchrecursivo(fb,ponto:tuple,cor:str,interna_anterior=None): 
+    x,y = ponto
+    largura = len(fb)
+    altura = len(fb[0])
+    if 0<=x<largura and 0<=y<altura:
+        cor_interna = fb[x][y]
+        if not interna_anterior:
+             interna_anterior = cor_interna
+        if cor != cor_interna and cor_interna == interna_anterior:
+            fb[x][y] = cor
+            preenchrecursivo(fb,(x+1,y),cor,interna_anterior)
+            preenchrecursivo(fb,(x,y+1),cor,interna_anterior)
+            preenchrecursivo(fb,(x-1,y),cor,interna_anterior)
+            preenchrecursivo(fb,(x,y-1),cor,interna_anterior)
+
 def curva(controlPT,passo):
     n = len(controlPT)
     pts = [None] * (n + 1)

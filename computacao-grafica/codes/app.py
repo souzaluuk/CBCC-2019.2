@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
-from algoritmos import bresenham, circulo, curva
+from algoritmos import bresenham, circulo, curva, preenchrecursivo
 #
 #No manjaro, necessário usar:
 # `pacman -S tk`
@@ -10,20 +10,20 @@ class App(tk.Tk):
     frame_buffer_aux = []
     def __init__(self, escala=5, largura=600, altura=600, titulo='CG-2019.2'):
         super().__init__()
-        # MODOS = LIVRE, LINHA, CIRCULO, CURVA, PREE_REC, PREE_SCAN
+        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN
         self.title(titulo)
         self.altura = altura
         self.largura = largura
         self.escala = escala
         self.ferramentas = None
         self.canvas = None
-        self.cor = 'black'
+        self.cor = '#000000'
         self.frame_buffer = None
         self.modo = 'LIVRE'
 
     def limpa_buffer(self):
         # inicializa frame buffer
-        self.frame_buffer = [['white' for x in range(self.largura//self.escala)] for y in range(self.altura//self.escala)]
+        self.frame_buffer = [['#ffffff' for x in range(self.largura//self.escala)] for y in range(self.altura//self.escala)]
         self.frame_buffer_aux = []
         self.pinta_buffer([(x,y) for x in range(self.largura//self.escala) for y in range(self.altura//self.escala)])
 
@@ -99,6 +99,12 @@ class App(tk.Tk):
                     self.pinta_buffer(self.frame_buffer_aux) # sempre após o add_frame_buffer
                     self.frame_buffer_aux = []
             f_event = f
+        elif modo=='PREE_REC':
+            def f(event):
+                x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
+                preenchrecursivo(self.frame_buffer,(x,y),self.cor)
+                self.pinta_buffer([(x,y) for x in range(self.largura//self.escala) for y in range(self.altura//self.escala)])
+            f_event = f
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
@@ -149,8 +155,8 @@ class App(tk.Tk):
             tk.Button(pai,text='Linha',command=lambda: self.muda_opcao('LINHA'),width=w_bt),
             tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt),
             tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt),
-            tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('scanline'),width=w_bt),
-            tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('recursivo'),width=w_bt),
+            tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt),
+            tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt),
         ]
         for botao in botoes:
             botao.pack()
@@ -186,6 +192,6 @@ class App(tk.Tk):
         y //= self.escala
         return x,y
 
-app = App(escala=10)
+app = App(escala=20)
 app.show()
 exit()
