@@ -19,7 +19,7 @@ def curva(controlPT,passo):
         xfim,yfim = pts[0]
         coord.append((round(xfim),round(yfim)))
         t+=passo
-    return coord
+    return set(coord)
 
 def circulo(ponto_centro:tuple,ponto_raio:tuple):
     x1,y1 = ponto_centro # centro do circulo

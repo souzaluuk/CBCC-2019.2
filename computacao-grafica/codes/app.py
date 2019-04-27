@@ -40,20 +40,26 @@ class App(tk.Tk):
         modo = self.modo
         f_event = None
         self.frame_buffer_aux = []
+        self.canvas.unbind('<Double-Button-1>')
+        self.canvas.unbind('<B1-Motion>')
         if modo=='LIVRE':
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
-                self.add_frame_buffer(x,y,self.cor) # adiciona cor no pixel indicado
-                self.pinta_buffer([(x,y)]) # pinta diretamente o pixel
+                if self.largura//self.escala>x>=0<=y<self.altura//self.escala:
+                    self.add_frame_buffer(x,y,self.cor) # adiciona cor no pixel indicado
+                    self.pinta_buffer([(x,y)]) # pinta diretamente o pixel
+            self.canvas.bind('<B1-Motion>',f)
             f_event = f
         elif modo=='LINHA':
             # pintando linha a cada novo clique ( para finalizar uma linha)
             # para finalização de uma linha deve-se mudar o modo de pintura, ou clicar em linha novamente
+            def duplo_clique(event): self.frame_buffer_aux=[]
+            self.canvas.bind('<Double-Button-1>',duplo_clique)
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
                 if self.frame_buffer_aux: # caso haja algo no buffer auxiliar
                     x0,y0 = self.frame_buffer_aux[-1]
-                    self.frame_buffer_aux = bresenham((x0,y0),(x,y))
+                    self.frame_buffer_aux = bresenham((x0,y0),(x,y)) # retorna coordenadas da linha
                     for x,y in self.frame_buffer_aux:
                         self.add_frame_buffer(x,y,self.cor)
                 else: # se buffer auxiliar vazio
@@ -87,7 +93,7 @@ class App(tk.Tk):
                 self.frame_buffer_aux.append((x,y))
                 if len(self.frame_buffer_aux)>1 and self.frame_buffer_aux[-2]==self.frame_buffer_aux[-1]:
                     self.frame_buffer_aux.pop(-1)
-                    self.frame_buffer_aux = curva(self.frame_buffer_aux,0.0005)
+                    self.frame_buffer_aux = curva(self.frame_buffer_aux,0.0001)
                     for x,y in self.frame_buffer_aux:
                         self.add_frame_buffer(x,y,self.cor)
                     self.pinta_buffer(self.frame_buffer_aux) # sempre após o add_frame_buffer
