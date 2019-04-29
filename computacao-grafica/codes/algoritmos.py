@@ -44,7 +44,7 @@ def circulo(ponto_centro:tuple,ponto_raio:tuple):
     x,y = (0,raio) # ponto de partida na construção o círculo (deslocado para o centro)
     p = 1 - raio
     coords.append((x,y))
-    while x<y:
+    while x<y-1:
         x+=1
         if p<0:
             p+=2*x+3
