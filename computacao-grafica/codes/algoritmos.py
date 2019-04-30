@@ -1,17 +1,26 @@
-def preenchrecursivo(fb,ponto:tuple,cor:str,interna_anterior=None): 
-    x,y = ponto
-    largura = len(fb)
-    altura = len(fb[0])
-    if 0<=x<largura and 0<=y<altura:
-        cor_interna = fb[x][y]
-        if not interna_anterior:
-             interna_anterior = cor_interna
-        if cor != cor_interna and cor_interna == interna_anterior:
-            fb[x][y] = cor
-            preenchrecursivo(fb,(x+1,y),cor,interna_anterior)
-            preenchrecursivo(fb,(x,y+1),cor,interna_anterior)
-            preenchrecursivo(fb,(x-1,y),cor,interna_anterior)
-            preenchrecursivo(fb,(x,y-1),cor,interna_anterior)
+def preenchscanline(fb):
+    for y in range(len(fb)):
+        print(y,fb[y])
+    return 0
+
+def preenchrecursivo(fb,ponto:tuple,cor_nova:str):
+    conjunto = [ ponto ]
+    altura = len(fb)
+    largura = len(fb[0])
+    
+    cor_atual = fb[ponto[0]][ponto[1]] # cor_interna atual
+
+    while len(conjunto)>0:
+        x,y = conjunto.pop()
+        if not (0<=x<largura and 0<=y<altura):
+            continue
+        if fb[x][y] != cor_atual or cor_nova == cor_atual:
+            continue
+        fb[x][y] = cor_nova
+        conjunto.append( (x-1,y) )
+        conjunto.append( (x+1,y) )
+        conjunto.append( (x,y-1) )
+        conjunto.append( (x,y+1) )
 
 def curva(controlPT,passo):
     n = len(controlPT)
@@ -25,16 +34,16 @@ def curva(controlPT,passo):
         x1,y1 = p1
         x2,y2 = p2
         return (x1+x2,y1+y2)
-    coord = []
+    coord = set()
     t=0
     while t<1:
         for r in range(1, n+1):
             for i in range(0, n-r):
                 pts[i] = soma(mult(pts[i],(1-t)),mult(pts[i+1],t))
         xfim,yfim = pts[0]
-        coord.append((round(xfim),round(yfim)))
+        coord.add((round(xfim),round(yfim)))
         t+=passo
-    return set(coord)
+    return coord
 
 def circulo(ponto_centro:tuple,ponto_raio:tuple):
     x1,y1 = ponto_centro # centro do circulo

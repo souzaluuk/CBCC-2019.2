@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
-from algoritmos import bresenham, circulo, curva, preenchrecursivo
+from algoritmos import bresenham, circulo, curva, preenchrecursivo, preenchscanline
 #
 #No manjaro, necessário usar:
 # `pacman -S tk`
@@ -105,6 +105,8 @@ class App(tk.Tk):
                 preenchrecursivo(self.frame_buffer,(x,y),self.cor)
                 self.pinta_buffer([(x,y) for x in range(self.largura//self.escala) for y in range(self.altura//self.escala)])
             f_event = f
+        elif modo=='PREE_SCAN':
+            print(preenchscanline(self.frame_buffer))
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
@@ -192,6 +194,6 @@ class App(tk.Tk):
         y //= self.escala
         return x,y
 
-app = App(escala=20)
+app = App(escala=10)
 app.show()
 exit()
