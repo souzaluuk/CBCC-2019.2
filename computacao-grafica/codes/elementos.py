@@ -31,7 +31,6 @@ class Pixel(Elemento):
 
 class Linha(Elemento):
     '''Classe que representa uma linha'''
-    trocax = trocay = trocaxy = False # flags para reflexões
     def __init__(self,ponto_a,ponto_b,cor_linha=COR_PADRAO): # recebe tuplas
         '''Construtor da linha'''
         xa,ya = ponto_a

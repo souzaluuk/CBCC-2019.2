@@ -123,7 +123,7 @@ def bresenham(pixel_a:tuple,pixel_b:tuple):
 
     m = calcula_m(p1,p2) # guarda o cálculo de (x2-x1)/(y2-y1)
     x1,y1 = p1
-    x2,y2 = p2
+    x2,_ = p2
 
     pixels = list() # lista de pixels que será retornada
     e = m - 0.5 # primeiro valor de 'e'
