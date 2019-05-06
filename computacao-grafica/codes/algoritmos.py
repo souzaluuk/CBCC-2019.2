@@ -8,15 +8,16 @@ def preenchrecursivo(fb,ponto:tuple,cor_nova:str):
     altura = len(fb)
     largura = len(fb[0])
     
-    cor_atual = fb[ponto[0]][ponto[1]] # cor_interna atual
+    x,y = ponto
+    cor_atual = fb[y][x] # cor_interna atual ***lembrando *** "y -> linha ; x -> coluna"
 
     while len(conjunto)>0:
-        x,y = conjunto.pop()
+        x,y = conjunto.pop() # ***lembrando *** "y -> linha ; x -> coluna"
         if not (0<=x<largura and 0<=y<altura):
             continue
-        if fb[x][y] != cor_atual or cor_nova == cor_atual:
+        if fb[y][x] != cor_atual or cor_nova == cor_atual:
             continue
-        fb[x][y] = cor_nova
+        fb[y][x] = cor_nova
         conjunto.append( (x-1,y) )
         conjunto.append( (x+1,y) )
         conjunto.append( (x,y-1) )
