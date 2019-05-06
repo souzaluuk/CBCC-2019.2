@@ -1,5 +1,97 @@
 import elementos
 
+def cohen_Sutherland(linha, p_min:tuple, p_max:tuple):
+    dentro_janela = 0  # 0000
+    esquerda_janela = 1  # 0001
+    direita_janela = 2  # 0010
+    baixo_janela = 4  # 0100
+    cima_janela = 8  # 1000
+
+    p1,p2 = linha
+    
+    x1, y1 = p1
+    x2, y2 = p2
+
+    x_min,y_min = p_min
+    x_max,y_max = p_max
+
+    def define_bit(x, y):
+        bit = dentro_janela
+        if x < x_min:  # para a esquerda da janela
+            bit |= esquerda_janela
+        elif x > x_max:  # para a direita da janela
+            bit |= direita_janela
+        if y < y_min:  # para baixo da janela
+            bit |= baixo_janela
+        elif y > y_max:  # para cima da janela
+            bit |= cima_janela
+        return bit
+
+    #define o bit equivalente a área que o extremo da linha está
+    bit1 = define_bit(x1,y1)
+    bit2 = define_bit(x2,y2)
+
+    linha_aceita = False
+
+    while True:
+        # Se os dois extremos estiverem dentro do retangulo
+        if bit1 == 0 and bit2 == 0:
+            linha_aceita = True
+            break
+        # Se os dois extremos estiverem fora do retangulo
+        elif (bit1 & bit2) != 0:
+            break
+        # Algum segmento da linha está dentro do retangulo
+        else:
+            # Pelo menos um dos pontos está fora
+            x = 1.0
+            y = 1.0
+            if bit1 != 0:
+                bit_fora = bit1
+            else:
+                bit_fora = bit2
+
+            # Encontrar o ponto de interseção
+            if bit_fora & cima_janela:
+                # ponto sobre a janela
+                x = x1 + (x2 - x1) * \
+                    (y_max - y1) / (y2 - y1)
+                y = y_max
+            elif bit_fora & baixo_janela:
+                # ponto abaixo da janela
+                x = x1 + (x2 - x1) * \
+                    (y_min - y1) / (y2 - y1)
+                y = y_min
+            elif bit_fora & direita_janela:
+                # ponto a direita da janela
+                y = y1 + (y2 - y1) * \
+                    (x_max - x1) / (x2 - x1)
+                x = x_max
+            elif bit_fora & esquerda_janela:
+                # ponto a esquerda da janela
+                y = y1 + (y2 - y1) * \
+                    (x_min - x1) / (x2 - x1)
+                x = x_min
+            #Substitui com o ponto de interseção encontrado
+            if bit_fora == bit1:
+                x1 = x
+                y1 = y
+                bit1 = define_bit(x1, y1)
+            else:
+                x2 = x
+                y2 = y
+                bit2 = define_bit(x2, y2)
+    if linha_aceita:
+        #print("Linha aceita de %.2f,%.2f para %.2f,%.2f" % (x1, y1, x2, y2))
+        x1 = round(x1)
+        x2 = round(x2)
+        y1 = round(y1)
+        y2 = round(y2)
+        return ((x1,y1),(x2,y2))
+    else:
+        #print("Linha rejeitada")
+        return None
+
 def preenchscanline(fb,poligono,cor):
     borda = list(poligono.borda())
     if not poligono.fechado:
@@ -29,13 +121,10 @@ def preenchscanline(fb,poligono,cor):
                                     scanlines[y].pop(-1)
     for y in scanlines:
         linhas = scanlines[y]
-        paridade = 0
         for x in range(len(linhas)-1):
-            paridade+=1
-            if paridade%2==1:
-                x0,xs = linhas[x], linhas[x+1]
-                for i in range(x0+1,xs):
-                    fb[y][i] = cor
+            x0,xs = linhas[x], linhas[x+1]
+            for i in range(x0+1,xs):
+                fb[y][i] = cor
 
 def preenchrecursivo(fb,ponto:tuple,cor_nova:str):
     conjunto = [ ponto ]

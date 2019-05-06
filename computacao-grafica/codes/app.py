@@ -13,7 +13,7 @@ class App(tk.Tk):
     formas = []
     def __init__(self, escala=10, largura=600, altura=500, titulo='CG-2019.2'):
         super().__init__()
-        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN
+        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN, CORTE_LINHA
         self.title(titulo)
         self.escala = escala
         self.altura = altura//escala # quantidade de linhas (y)
@@ -96,6 +96,7 @@ class App(tk.Tk):
             tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt),
             tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt),
             tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt),
+            tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt)
         ]
         for botao in botoes:
             botao.pack()
@@ -258,6 +259,30 @@ class App(tk.Tk):
                 self.pinta_buffer()
             else:
                 print('selecione uma figura')
+        elif modo=='CORTE_LINHA':
+            def f(event):
+                x,y = self.xyscala(event.x,event.y) # captura x e y do canvas e converte de acordo com nossa escala
+                self.marca_pixel(x,y)
+                if not self.forma_aux: # se a forma auxiliar for None (Nula)
+                    self.forma_aux = Poligono((x,y)) # realiza instância de uma Linha com a coordenada inicial
+                else:
+                    self.forma_aux.vertices.append((x,y))
+                    self.forma_aux.vertices.sort()
+                    p_min,p_max = self.forma_aux.vertices
+                    self.forma_aux = None
+                    index =  self.lista_box.curselection()
+                    if index:
+                        index = index[0]
+                        linha = self.formas[index]
+                        self.limpa_buffer()
+                        nova_linha = Poligono(None)
+                        nova_linha.vertices = algoritmos.cohen_Sutherland(linha.vertices,p_min,p_max)
+                        for x,y in nova_linha.borda():
+                            self.add_frame_buffer(x,y,self.cor)
+                        self.pinta_buffer()
+                    else:
+                        print('selecione uma figura')
+            f_event = f
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
