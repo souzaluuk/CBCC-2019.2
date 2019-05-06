@@ -18,9 +18,10 @@ class Circulo:
     def borda(self):
         return algoritmos.circulo(self.centro,self.raio)
 
-class Linha:
-    def __init__(self,*pontos):
+class Poligono:
+    def __init__(self,*pontos,cor_borda=None,cor_interna=None):
         self.vertices = list(pontos)
+        self.cor_borda = cor_borda
     def borda(self):
         if len(self.vertices)==1:
             return self.vertices
