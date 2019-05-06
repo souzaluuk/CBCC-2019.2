@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
 from algoritmos import bresenham, circulo, curva, preenchrecursivo, preenchscanline
-from elementos import Pixel, Poligono
 #
 #No manjaro, necessário usar:
 # `pacman -S tk`
@@ -9,8 +8,6 @@ from elementos import Pixel, Poligono
 class App(tk.Tk):
     w_bt = 6 # largura dos botões
     frame_buffer_aux = [] # frame_buffer auxiliar
-    elementos = [] # para controle dos elementos criados
-    pontos_controle = [] # para pontos de controle (exemplo, pontos de controle de uma curva)
     def __init__(self, escala=10, largura=600, altura=600, titulo='CG-2019.2'):
         super().__init__()
         # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN
@@ -20,16 +17,14 @@ class App(tk.Tk):
         self.largura = largura//escala
         self.ferramentas = None
         self.canvas = None
-        self.cor = '#000000'
         self.frame_buffer = None
-        self.modo = 'LIVRE' # modo inicial
+        self.cor = '#000000'
+        self.modo = 'LINHA' # modo inicial
 
     def limpa_buffer(self):
         # inicializa frame buffer
         self.frame_buffer = [['#ffffff' for x in range(self.largura)] for y in range(self.altura)]
         self.frame_buffer_aux.clear()
-        self.elementos.clear()
-        self.pontos_controle.clear()
         self.pinta_buffer()
 
     def show(self):
@@ -124,9 +119,6 @@ class App(tk.Tk):
         frame_ferramenta.grid(row=0,column=1)
         label_ponto = tk.Label(frame_ferramenta,text='(00,00)')
         label_ponto.pack()
-        # lista de elemtnos
-        #lista_elementos = tk.Listbox(frame_ferramenta,width=self.w_bt+2)
-        #lista_elementos.pack()
         # eventos para label_ponto
         def motion_mouse(event):
             x,y = self.xyscala(event.x,event.y)
@@ -162,7 +154,7 @@ class App(tk.Tk):
         w_bt = self.w_bt
         botoes = [
             tk.Button(pai,text='Limpar',command=self.limpa_buffer,width=w_bt),
-            tk.Button(pai,text='Livre',command=lambda: self.muda_opcao('LIVRE'),width=w_bt),
+            #tk.Button(pai,text='Livre',command=lambda: self.muda_opcao('LIVRE'),width=w_bt),
             tk.Button(pai,text='Linha',command=lambda: self.muda_opcao('LINHA'),width=w_bt),
             tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt),
             tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt),
