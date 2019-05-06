@@ -11,9 +11,9 @@ class App(tk.Tk):
     frame_buffer_aux = [] # frame_buffer auxiliar
     forma_aux = None
     formas = []
-    def __init__(self, escala=10, largura=600, altura=500, titulo='CG-2019.2'):
+    def __init__(self, escala=10, largura=600, altura=700, titulo='CG-2019.2'):
         super().__init__()
-        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN, CORTE_LINHA
+        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN, CORTE_LINHA, TRANSLAD
         self.title(titulo)
         self.escala = escala
         self.altura = altura//escala # quantidade de linhas (y)
@@ -96,7 +96,8 @@ class App(tk.Tk):
             tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt),
             tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt),
             tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt),
-            tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt)
+            tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt),
+            tk.Button(pai,text='Translação',command=lambda: self.muda_opcao('TRANSLAD'),width=w_bt)
         ]
         for botao in botoes:
             botao.pack()
@@ -282,6 +283,24 @@ class App(tk.Tk):
                         self.pinta_buffer()
                     else:
                         print('selecione uma figura')
+            f_event = f
+        elif modo=='TRANSLAD':
+            def f(event):
+                x,y = self.xyscala(event.x,event.y) # captura x e y do canvas e converte de acordo com nossa escala
+                
+                index =  self.lista_box.curselection()
+                if index:
+                    index = index[0]
+                    linha = self.formas[index]
+                    self.limpa_buffer()
+                    linha.vertices = algoritmos.translate(linha.vertices,(x,y))
+                    print(linha.vertices)
+                    for x,y in linha.borda():
+                        self.add_frame_buffer(x,y,self.cor)
+                    self.pinta_buffer()
+                else:
+                    print('selecione uma figura')
+                
             f_event = f
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')

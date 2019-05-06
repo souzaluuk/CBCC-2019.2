@@ -1,4 +1,30 @@
-import elementos
+def translate(pontos, ponto_t):
+    tx,ty = ponto_t
+    for i in range(len(pontos)):
+        x,y = pontos[i]
+        print((x,y),'->',ponto_t,':',(x-tx,y-ty))
+        pontos[i] = (x+tx,y+ty)
+    return pontos
+
+'''
+import algoritmos
+from elementos import Poligono
+linha = Poligono((0,0),(0,0))
+algoritmos.translate(linha.vertices,(10,10))
+linha = Poligono((10,10),(10,101))
+algoritmos.translate(linha.vertices,(10,10))
+linha = Poligono((20,20),(20,20))
+algoritmos.translate(linha.vertices,(10,10))
+'''
+
+'''def rotate(points, rotationDegree):
+  degreeCos = math.cos(math.radians(rotationDegree))
+  degreeSin = math.sin(math.radians(rotationDegree))
+  return list(Point(point.x * degreeCos - point.y * degreeSin, point.y * degreeCos + point.x * degreeSin) for point in points)'''
+
+'''def scale(points, scaleFactor):
+  return list(Point(point.x,  point.y) * scaleFactor for point in points)'''
+
 
 def cohen_Sutherland(linha, p_min:tuple, p_max:tuple):
     dentro_janela = 0  # 0000
@@ -93,6 +119,7 @@ def cohen_Sutherland(linha, p_min:tuple, p_max:tuple):
         return None
 
 def preenchscanline(fb,poligono,cor):
+    import elementos
     borda = list(poligono.borda())
     if not poligono.fechado:
         borda.extend(bresenham(borda[-1],borda[0]))
