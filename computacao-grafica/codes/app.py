@@ -113,12 +113,13 @@ class App(tk.Tk):
         return canvas
 
     def add_frame_buffer(self,x,y,cor):
-        self.frame_buffer[y][x] = cor # y -> linha ; x -> coluna
+        if self.largura>x>=0<=y<self.altura:
+            self.frame_buffer[y][x] = cor # y -> linha ; x -> coluna
 
     def pinta_coord(self,coord):
         # exemplo de coord [(x0,y0),(x1,y1),...,(xn,yn)]
         escala = self.escala
-        for pixel in coord:
+        for pixel in filter(lambda p: self.largura>p[0]>=0<=p[1]<self.altura,coord):
             x,y = pixel
             cor = self.frame_buffer[y][x] # y -> linha ; x -> coluna
             x = x*escala
@@ -162,6 +163,7 @@ class App(tk.Tk):
     
     def add_forma(self):
         if self.forma_aux:
+            self.forma_aux.cor_borda = self.cor
             self.formas.append(self.forma_aux)
             self.forma_aux = None
             self.lista_box.insert(tk.END,'Poligono'+str(len(self.formas)))
@@ -179,7 +181,7 @@ class App(tk.Tk):
             index = index[0]
             forma = self.formas[index]
             for x,y in forma.borda():
-                self.frame_buffer[y][x] = self.cor
+                self.add_frame_buffer(x,y,forma.cor_borda)
             self.pinta_coord(forma.borda())
 
     def cria_eventos(self):
@@ -203,47 +205,45 @@ class App(tk.Tk):
                 x,y = self.xyscala(event.x,event.y) # captura x e y do canvas e converte de acordo com nossa escala
                 if not self.forma_aux: # se a forma auxiliar for None (Nula)
                     self.forma_aux = Poligono((x,y)) # realiza instância de uma Linha com a coordenada inicial
-                    self.frame_buffer[y][x] = self.cor # adiciona cor ao pixel no frame buffer
+                    self.add_frame_buffer(x,y,self.cor) # adiciona cor ao pixel no frame buffer
                     self.pinta_coord([(x,y)]) # pinta no Canvas a coordenada informada
                 elif (x,y) != self.forma_aux.vertices[-1]: # se o último vértice for diferente do novo clicado
                     for x,y in bresenham(self.forma_aux.vertices[-1],(x,y)):
-                        self.frame_buffer[y][x] = self.cor # adiciona cor ao pixel no frame buffer
+                        self.add_frame_buffer(x,y,self.cor) # adiciona cor ao pixel no frame buffer
                     self.pinta_coord(bresenham(self.forma_aux.vertices[-1],(x,y)))
                     self.forma_aux.vertices.append((x,y)) # adiciona vértice à linha
                 if len(self.forma_aux.vertices)>1 and self.forma_aux.vertices[0] == self.forma_aux.vertices[-1]:
                     self.add_forma() # adiciona e reseta self.forma_aux
             f_event = f
         elif modo=='CIRCULO':
-            # pintando linha a cada novo clique ( para finalizar uma linha)
-            # para finalização de uma linha deve-se mudar o modo de pintura, ou clicar em linha novamente
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
-                if self.frame_buffer_aux: # caso haja algo no buffer auxiliar
-                    x0,y0 = self.frame_buffer_aux[-1]
-                    self.frame_buffer_aux = list(
-                        filter(
-                            lambda p: self.largura>p[0]>=0<=p[1]<self.altura,
-                            circulo((x0,y0),(x,y))
-                        )
-                    )
-                    for x,y in self.frame_buffer_aux:
-                        self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_coord(self.frame_buffer_aux)
-                    self.frame_buffer_aux=[]
-                else: # se buffer auxiliar vazio
-                    self.frame_buffer_aux.append((x,y)) # armazena a posição do raio
+                if not self.forma_aux:
+                    self.forma_aux = Circulo((x,y),None)
+                else:
+                    self.forma_aux.raio = (x,y)
+                    self.forma_aux.cor_borda = self.cor
+                    for x,y in self.forma_aux.borda():
+                        self.add_frame_buffer(x,y,self.forma_aux.cor_borda)
+                        self.pinta_coord([(x,y)])
+                    self.add_forma()
             f_event = f
         elif modo=='BEZIER':
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
-                self.frame_buffer_aux.append((x,y))
-                if len(self.frame_buffer_aux)>1 and self.frame_buffer_aux[-2]==self.frame_buffer_aux[-1]:
-                    self.frame_buffer_aux.pop(-1)
-                    self.frame_buffer_aux = curva(self.frame_buffer_aux,0.0001)
-                    for x,y in self.frame_buffer_aux:
-                        self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_coord(self.frame_buffer_aux) # sempre após o add_frame_buffer
-                    self.frame_buffer_aux = []
+                self.marca_pixel(x,y)
+                if not self.forma_aux:
+                    self.forma_aux = Curva((x,y))
+                else:
+                    self.forma_aux.pontos.append((x,y))
+
+                if len(self.forma_aux.pontos)>1 and self.forma_aux.pontos[-2]==self.forma_aux.pontos[-1]:
+                    self.forma_aux.pontos.pop(-1)
+                    self.forma_aux.cor_borda = self.cor
+                    for x,y in self.forma_aux.borda():
+                        self.add_frame_buffer(x,y,self.forma_aux.cor_borda)
+                        self.pinta_coord([(x,y)])
+                    self.add_forma()
             f_event = f
         elif modo=='PREE_REC':
             def f(event):

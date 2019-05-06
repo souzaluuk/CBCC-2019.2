@@ -6,15 +6,17 @@ class Ponto:
         self.y=y
 
 class Curva:
-    def __init__(self,*pontos):
+    def __init__(self,*pontos,cor_borda=None,cor_interna=None):
         self.pontos = list(pontos)
     def borda(self):
         return algoritmos.curva(self.pontos,0.0001)
 
 class Circulo:
-    def __init__(self,centro:tuple,raio:tuple):
+    def __init__(self,centro:tuple,raio:tuple,cor_borda=None,cor_interna=None):
         self.centro = centro
         self.raio = raio
+        self.cor_borda=cor_borda
+        self.cor_interna=cor_interna
     def borda(self):
         return algoritmos.circulo(self.centro,self.raio)
 

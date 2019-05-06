@@ -10,7 +10,6 @@ def preenchrecursivo(fb,ponto:tuple,cor_nova:str):
     
     x,y = ponto
     cor_atual = fb[y][x] # cor_interna atual ***lembrando *** "y -> linha ; x -> coluna"
-
     while len(conjunto)>0:
         x,y = conjunto.pop() # ***lembrando *** "y -> linha ; x -> coluna"
         if not (0<=x<largura and 0<=y<altura):
