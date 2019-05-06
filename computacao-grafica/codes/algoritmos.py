@@ -1,7 +1,41 @@
-def preenchscanline(fb):
-    for y in range(len(fb)):
-        print(y,fb[y])
-    return 0
+import elementos
+
+def preenchscanline(fb,poligono,cor):
+    borda = list(poligono.borda())
+    if not poligono.fechado:
+        borda.extend(bresenham(borda[-1],borda[0]))
+    xmin = min(map(lambda p:p[0],borda))
+    xmax = max(map(lambda p:p[0],borda))
+    ymin = min(map(lambda p:p[1],borda))
+    ymax = max(map(lambda p:p[1],borda))
+
+    scanlines = {}
+    
+    for y in range(ymin,ymax+1):
+        scanlines[y] = list()
+        for x in range(xmin,xmax+1):
+            if (x,y) in borda:
+                scanlines[y].append(x)
+                if borda.count((x,y))>1:
+                    if not type(poligono) == elementos.Poligono:
+                        pass
+                        #scanlines[y].append(x)
+                    else:
+                        if (x,y) in poligono.vertices:
+                            index = poligono.vertices.index((x,y))
+                            conjunto_teste = poligono.vertices[index-1:index+2]
+                            if conjunto_teste:
+                                if max(conjunto_teste,key=lambda p:p[1]) == poligono.vertices[index] or min(conjunto_teste,key=lambda p:p[1]) == poligono.vertices[index]:
+                                    scanlines[y].pop(-1)
+    for y in scanlines:
+        linhas = scanlines[y]
+        paridade = 0
+        for x in range(len(linhas)-1):
+            paridade+=1
+            if paridade%2==1:
+                x0,xs = linhas[x], linhas[x+1]
+                for i in range(x0+1,xs):
+                    fb[y][i] = cor
 
 def preenchrecursivo(fb,ponto:tuple,cor_nova:str):
     conjunto = [ ponto ]
@@ -34,14 +68,15 @@ def curva(controlPT,passo):
         x1,y1 = p1
         x2,y2 = p2
         return (x1+x2,y1+y2)
-    coord = set()
+    coord = []
     t=0
     while t<1:
         for r in range(1, n+1):
             for i in range(0, n-r):
                 pts[i] = soma(mult(pts[i],(1-t)),mult(pts[i+1],t))
         xfim,yfim = pts[0]
-        coord.add((round(xfim),round(yfim)))
+        if not (round(xfim),round(yfim)) in coord:
+            coord.append((round(xfim),round(yfim)))
         t+=passo
     return coord
 
@@ -64,11 +99,11 @@ def circulo(ponto_centro:tuple,ponto_raio:tuple):
     # realização das reflexões para os demais octantes
     coords_fim=coords[:] # cópia das coordenadas do primeiro octante
     coords_fim.extend([(y,x) for x,y in coords])
+    coords_fim.extend([(-y,x) for x,y in coords])
     coords_fim.extend([(y,-x) for x,y in coords])
     coords_fim.extend([(x,-y) for x,y in coords])
     coords_fim.extend([(-x,-y) for x,y in coords])
     coords_fim.extend([(-y,-x) for x,y in coords])
-    coords_fim.extend([(-y,x) for x,y in coords])
     coords_fim.extend([(-x,y) for x,y in coords])
     coords_fim=[(x+x1,y+y1) for x,y in coords_fim] # desloca de volta para o ponto de origem
     return coords_fim

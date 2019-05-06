@@ -28,7 +28,6 @@ class App(tk.Tk):
     def limpa_buffer(self):
         # inicializa frame buffer
         self.frame_buffer = [['#ffffff' for x in range(self.largura)] for y in range(self.altura)]
-        self.frame_buffer_aux.clear()
         self.forma_aux = None
         self.pinta_buffer()
 
@@ -187,7 +186,6 @@ class App(tk.Tk):
     def cria_eventos(self):
         modo = self.modo
         f_event = None
-        self.frame_buffer_aux = []
         self.forma_aux = None
         self.canvas.unbind('<Double-Button-1>')
         self.canvas.unbind('<B1-Motion>')
@@ -213,6 +211,7 @@ class App(tk.Tk):
                     self.pinta_coord(bresenham(self.forma_aux.vertices[-1],(x,y)))
                     self.forma_aux.vertices.append((x,y)) # adiciona vértice à linha
                 if len(self.forma_aux.vertices)>1 and self.forma_aux.vertices[0] == self.forma_aux.vertices[-1]:
+                    self.forma_aux.fechado = True
                     self.add_forma() # adiciona e reseta self.forma_aux
             f_event = f
         elif modo=='CIRCULO':
@@ -252,7 +251,13 @@ class App(tk.Tk):
                 self.pinta_buffer()
             f_event = f
         elif modo=='PREE_SCAN':
-            print(preenchscanline(self.frame_buffer))
+            index =  self.lista_box.curselection()
+            if index:
+                index = index[0]
+                preenchscanline(self.frame_buffer,self.formas[index],self.cor)
+                self.pinta_buffer()
+            else:
+                print('selecione uma figura')
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
