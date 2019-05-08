@@ -101,8 +101,9 @@ class App(tk.Tk):
         botoes.append(tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt))
         botoes.append(tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt))
         botoes.append(tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt))
-        botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
+        #botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
         botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Corte Poligono',command=lambda: self.muda_opcao('CORTE_POLI'),width=w_bt))
         botoes.append(tk.LabelFrame(pai)) # frame translação
         botoes.append(tk.LabelFrame(pai)) # frame rotação
         botoes.append(tk.LabelFrame(pai)) # frame escala
@@ -417,6 +418,33 @@ class App(tk.Tk):
                 for x,y in cubo.borda():
                     self.add_frame_buffer(x,y,self.cor)
                 self.pinta_coord(cubo.borda())
+            else:
+                print('selecione uma figura')
+        elif modo=='CORTE_POLI':
+            z =  self.lista_box.curselection()
+            if z:
+                z = z[0]
+                p1 = self.formas[z]
+                p2 = self.formas[z+1]
+                
+                self.limpa_buffer()
+                
+                p1_list = list(map(lambda p: [p[0],p[1]],p1.coords))[:-1] # adiciona 'z' e 'h'
+                p2_list = list(map(lambda p: [p[0],p[1]],p2.coords))[:-1] # adiciona 'z' e 'h'
+                coords_novo = list(map(lambda p: (round(p[0]),round(p[1])), algoritmos.Sutherland_Hodgman(p1_list,len(p1_list),p2_list,len(p2_list))))
+
+                for i in range(0,len(coords_novo),2):
+                    if len(coords_novo[i:i+2])==2:
+                        p1_aux, p2_aux = coords_novo[i:i+2]
+                        linha = Poligono(p1_aux,p2_aux)
+                    else:
+                        p1_aux = coords_novo[i]
+                        linha = Poligono(p1_aux)
+                #for p_aux in coords_novo:
+                #    linha = Poligono(p_aux)'''
+                    for x,y in linha.borda():
+                        self.add_frame_buffer(x,y,self.cor)
+                    self.pinta_coord(linha.borda())
             else:
                 print('selecione uma figura')
         # substitui evento modo de pintura atual

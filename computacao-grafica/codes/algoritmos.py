@@ -151,6 +151,11 @@ def cohen_Sutherland(pontos_linha, p_min:tuple, p_max:tuple):
         #print("Linha rejeitada")
         return None
 
+def preenchscanline(fb, poligono,cor):
+    borda = poligono.borda()
+    if not poligono.fechado:
+        borda.extend(bresenham(borda[-1],borda[0]))
+    
 def preenchscanline(fb,poligono,cor):
     import elementos
     borda = list(poligono.borda())
@@ -322,3 +327,103 @@ def bresenham(pixel_a:tuple,pixel_b:tuple):
     pixels.append(p2)
     _reflexao(pixels,trocaxy,trocax,trocay)
     return pixels
+
+# Função para retornar o X do ponto de intersecção de duas linhas
+def intersecoes_x(x1,y1,x2,y2,x3,y3,x4,y4):
+    numerador = (x1*y2 - y1*x2) * (x3-x4) - (x1-x2) * (x3*y4 - y3*x4)
+    denominador = (x1-x2) * (y3-y4) - (y1-y2) * (x3-x4)
+    return numerador/denominador
+
+# Função para retornar o Y do ponto de intersecção de duas linhas
+def intersecoes_y(x1,y1,x2,y2,x3,y3,x4,y4):
+    numerador = (x1*y2 - y1*x2) * (y3-y4) - (y1-y2) * (x3*y4 - y3*x4)
+    denominador = (x1-x2) * (y3-y4) - (y1-y2) * (x3-x4)
+    return  numerador/denominador
+
+# Função que recorta todos as arestas e escreve um recorte de aresta da área recortada
+# tamanho_poligono = quantidade de arestas do poligono
+
+def recorte_poligono(pontos_poligono, tamanho_poligono, x1, y1, x2, y2):
+    pontos_novos = [[0, 0], [0, 0], [0, 0], [0, 0],[0, 0],[0, 0],[0, 0],[0, 0]]
+    novo_tamanho_poligono = 0
+
+    #(ix,iy),(kx,ky) são coordenadas dos pontos
+    for i in range(tamanho_poligono):
+        #I e K formam a linha no poligono
+        k = (i+1) % tamanho_poligono
+        ix = pontos_poligono[i][0]
+        iy = pontos_poligono[i][1]
+        kx = pontos_poligono[k][0]
+        ky = pontos_poligono[k][1]
+        print("i:", i)
+        print("k:", k)
+        print("ix:", ix)
+        print("iy:", iy)
+        print("kx:", kx)
+        print("ky:", ky)
+        #k = k % tamanho_poligono
+        #calculando a posição do primeiro ponto escrito pela linha de corte
+        i_posicao = (x2-x1) * (iy-y1) - (y2-y1) * (ix-x1)
+
+
+        #calculando a posição do segundo ponto escrito pela linha de corte
+        k_posicao = (x2-x1) * (ky-y1) - (y2-y1) * (kx-x1)
+
+
+        print(i_posicao)
+        print(k_posicao)
+
+        #Se o dois estiverem dentro:
+        if (i_posicao < 0 and k_posicao < 0):
+            #apenas o segundo ponto é adicionado
+            pontos_novos[novo_tamanho_poligono][0] = kx
+            pontos_novos[novo_tamanho_poligono][1] = ky
+            novo_tamanho_poligono = novo_tamanho_poligono +1
+            print("caso 1")
+
+        #Se apenas o ponto 1 está fora:
+        elif (i_posicao >= 0 and k_posicao < 0):
+            #Ponto de intersecção com a aresta e o segundo ponto são adicionados
+            pontos_novos[novo_tamanho_poligono][0] = intersecoes_x(x1,y1,x2,y2,ix,iy,kx,ky)
+            pontos_novos[novo_tamanho_poligono][1] = intersecoes_y(x1,y1,x2,y2,ix,iy,kx,ky)
+            novo_tamanho_poligono = novo_tamanho_poligono +1
+
+            pontos_novos[novo_tamanho_poligono][0] = kx
+            pontos_novos[novo_tamanho_poligono][1] = ky
+            novo_tamanho_poligono = novo_tamanho_poligono + 1
+            print("caso 2")
+        #Se apenas o ponto 2 está fora:
+        elif (i_posicao<0 and k_posicao>=0):
+            #Apenas o ponto de intersecção com a aresta é adicionado
+            pontos_novos[novo_tamanho_poligono][0] = intersecoes_x(x1,y1,x2,y2,ix,iy,kx,ky)
+            pontos_novos[novo_tamanho_poligono][1] = intersecoes_y(x1,y1,x2,y2,ix,iy,kx,ky)
+            novo_tamanho_poligono = novo_tamanho_poligono +1
+            print("caso 3")
+        else:
+            print("caso 4")
+
+    #print(novo_tamanho_poligono)
+    #Copiando novos pontos dentro do array original e mudando o número de vertices
+    tamanho_poligono = novo_tamanho_poligono
+
+    for i in range(tamanho_poligono):
+        pontos_poligono[i][0] = pontos_novos[i][0]
+        pontos_poligono[i][1] = pontos_novos[i][1]
+    return tamanho_poligono
+
+#Implementação do Algoritmo de Sutherland-Hodgman:
+def Sutherland_Hodgman(pontos_poligono, tamanho_poligono, pontos_recorte, tamanho_recorte):
+    #I e K são dois índices consecutivos:
+    for i in range(tamanho_recorte):
+        k = (i+1) % tamanho_recorte
+        #Passa para a função os parâmetros: atual array de vertices, o tamanho do poligono e os pontos finais da linha de recorte selecionada
+        tamanho_poligono = recorte_poligono(pontos_poligono, tamanho_poligono, pontos_recorte[i][0], pontos_recorte[i][1], pontos_recorte[k][0], pontos_recorte[k][1])
+
+    #Printando os vertices do poligono recortado
+    for i in range(tamanho_poligono):
+        print(pontos_poligono[i][0])
+        print(pontos_poligono[i][1])
+        print("-")
+    return pontos_poligono # [[0,0],[0,1]...[n,m]]
+
+#print(Sutherland_Hodgman([[0,0],[0,10],[10,10],[10,0]],4,[[0,1],[0,6],[12,6],[12,0]],4))
