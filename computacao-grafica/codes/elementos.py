@@ -37,3 +37,15 @@ class Poligono:
             for i in range(len(v)-1):
                 borda.extend(algoritmos.bresenham(v[i],v[i+1]))
             return borda
+
+class Cubo:
+    def __init__(self,poligono_a,poligono_b):
+        self.poligono_a = poligono_a
+        self.poligono_b = poligono_b
+    def borda(self):
+        borda = []
+        borda.extend(self.poligono_a.borda()) # z -> 2
+        borda.extend(self.poligono_b.borda()) # z -> 1
+        for p1,p2 in zip(self.poligono_a.coords,self.poligono_b.coords):
+            borda.extend(algoritmos.bresenham(p1,p2))
+        return borda

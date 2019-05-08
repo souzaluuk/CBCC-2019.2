@@ -1,3 +1,32 @@
+def projecao_perspectiva(poligono,d):
+    matriz = [[d,0,0,0],[0,d,0,0],[0,0,d,0],[0,0,1,0]]
+    novos_pontos = []
+    for i in range(len(poligono)):
+        vetor_aux = []
+        vetor_aux.append( (matriz[0][0]*poligono[i][0]) + (matriz[0][1]*poligono[i][1]) + (matriz[0][2]*poligono[i][2]) + (matriz[0][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[1][0]*poligono[i][0]) + (matriz[1][1]*poligono[i][1]) + (matriz[1][2]*poligono[i][2]) + (matriz[1][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[2][0]*poligono[i][0]) + (matriz[2][1]*poligono[i][1]) + (matriz[2][2]*poligono[i][2]) + (matriz[2][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[3][0]*poligono[i][0]) + (matriz[3][1]*poligono[i][1]) + (matriz[3][2]*poligono[i][2]) + (matriz[3][3]*poligono[i][3]) )
+        novos_pontos.append(vetor_aux)
+    for i in range(len(poligono)):
+        novos_pontos[i][0] = round(novos_pontos[i][0] / novos_pontos[i][3])
+        novos_pontos[i][1] = round(novos_pontos[i][1] / novos_pontos[i][3])
+        novos_pontos[i][2] = round(novos_pontos[i][2] / novos_pontos[i][3])
+        novos_pontos[i][3] = round(novos_pontos[i][3] / novos_pontos[i][3])
+    return novos_pontos
+
+def  projecao_orto(poligono,x,y,z):
+    matriz = [[x,0,0,0],[0,y,0,0],[0,0,z,0],[0,0,0,1]]
+    novos_pontos = []
+    for i in range(len(poligono)):
+        vetor_aux = []
+        vetor_aux.append( (matriz[0][0]*poligono[i][0]) + (matriz[0][1]*poligono[i][1]) + (matriz[0][2]*poligono[i][2]) + (matriz[0][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[1][0]*poligono[i][0]) + (matriz[1][1]*poligono[i][1]) + (matriz[1][2]*poligono[i][2]) + (matriz[1][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[2][0]*poligono[i][0]) + (matriz[2][1]*poligono[i][1]) + (matriz[2][2]*poligono[i][2]) + (matriz[2][3]*poligono[i][3]) )
+        vetor_aux.append( (matriz[3][0]*poligono[i][0]) + (matriz[3][1]*poligono[i][1]) + (matriz[3][2]*poligono[i][2]) + (matriz[3][3]*poligono[i][3]) )
+        novos_pontos.append(vetor_aux)
+    return novos_pontos
+
 def translate(figura, ponto_t):
     tx,ty = ponto_t
     pontos = list(figura.coords)

@@ -64,7 +64,7 @@ class App(tk.Tk):
         label_frame.pack()
         #tk.Label(frame_ferramenta,text='Polígonos:').pack()
         tk.Label(label_frame,text='Polígonos:').pack()
-        self.lista_box = tk.Listbox(label_frame,w=self.w_bt,height=6)
+        self.lista_box = tk.Listbox(label_frame,w=self.w_bt,height=3)
         self.lista_box.pack()
         bt_add = tk.Button(label_frame,text='+',command=self.add_forma,width=self.w_bt//2)
         bt_rm = tk.Button(label_frame,text='-',command=self.rm_forma,width=self.w_bt//2)
@@ -103,12 +103,13 @@ class App(tk.Tk):
         botoes.append(tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt))
         botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
         botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
-        botoes.append(tk.LabelFrame(pai))
-        botoes.append(tk.LabelFrame(pai))
-        botoes.append(tk.LabelFrame(pai))
+        botoes.append(tk.LabelFrame(pai)) # frame translação
+        botoes.append(tk.LabelFrame(pai)) # frame rotação
+        botoes.append(tk.LabelFrame(pai)) # frame escala
+        botoes.append(tk.LabelFrame(pai)) # frame projeção perspectiva
 
         # ADICIONAL PARA TRANSLAÇÃO
-        conj_translacao = botoes[-3]
+        conj_translacao = botoes[-4]
         tk.Button(conj_translacao,text='Translação',command=lambda: self.muda_opcao('TRANSLA'),width=w_bt-1).pack()
         tk.Label(conj_translacao,text=' (  X  ,  Y  ) ').pack()
         frame_aux = tk.Frame(conj_translacao)
@@ -119,7 +120,7 @@ class App(tk.Tk):
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['y']).grid(row=0,column=1)
 
         # ADICIONAL PARA ROTOAÇÃO
-        conj_rotacao = botoes[-2]
+        conj_rotacao = botoes[-3]
         tk.Button(conj_rotacao,text='Rotação',command=lambda: self.muda_opcao('ROTAC'),width=w_bt-1).pack()
         tk.Label(conj_rotacao,text=' Grau ( 0º ) ').pack()
         frame_aux = tk.Frame(conj_rotacao)
@@ -128,7 +129,7 @@ class App(tk.Tk):
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['ang']).grid(row=0,column=0)
 
         # ADICIONAL ESCALA
-        conj_escala = botoes[-1]
+        conj_escala = botoes[-2]
         tk.Button(conj_escala,text='Escala',command=lambda: self.muda_opcao('ESCALA'),width=w_bt-1).pack()
         tk.Label(conj_escala,text=' (  X  ,  Y  ) ').pack()
         frame_aux = tk.Frame(conj_escala)
@@ -137,6 +138,17 @@ class App(tk.Tk):
         self.entrada_xy['y_escala'] = tk.StringVar()
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['x_escala']).grid(row=0,column=0)
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['y_escala']).grid(row=0,column=1)
+
+        # ADICIONAL PROJEÇÃO PERSPECTIVA
+        conj_perspe = botoes[-1]
+        tk.Button(conj_perspe,text='Proj. Pers.',command=lambda: self.muda_opcao('PERSPEC'),width=w_bt-1).pack()
+        tk.Label(conj_escala,text='   D      Z   ').pack()
+        frame_aux = tk.Frame(conj_perspe)
+        frame_aux.pack()
+        self.entrada_xy['D'] = tk.StringVar()
+        #self.entrada_xy['Z_PERSP'] = tk.StringVar()
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['D']).grid(row=0,column=0)
+        #tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['Z_PERSP']).grid(row=0,column=1)
 
         for botao in botoes:
             botao.pack()
@@ -383,9 +395,33 @@ class App(tk.Tk):
                 self.pinta_coord(linha.borda())
             else:
                 print('selecione uma figura')
+        elif modo=='PERSPEC':
+            z =  self.lista_box.curselection()
+            if z:
+                z = z[0]
+                p1 = self.formas[z]
+                p2 = self.formas[z-1]
+                
+                self.limpa_buffer()
+
+                d_focal = float(self.entrada_xy['D'].get())
+                #z_perps = int(self.entrada_xy['Z_PERSP'].get())
+                
+                p1_zh = list(map(lambda p: (p[0],p[1],1,1),p1.coords)) # adiciona 'z' e 'h'
+                p2_zh = list(map(lambda p: (p[0],p[1],2,1),p2.coords)) # adiciona 'z' e 'h'
+
+                p1.coords = list(map(lambda p: (p[0],p[1]),algoritmos.projecao_perspectiva(p1_zh,d_focal))) # projeção de p1
+                p2.coords = list(map(lambda p: (p[0],p[1]),algoritmos.projecao_perspectiva(p2_zh,d_focal))) # projeção de p2
+                
+                cubo = Cubo(p1,p2)
+                for x,y in cubo.borda():
+                    self.add_frame_buffer(x,y,self.cor)
+                self.pinta_coord(cubo.borda())
+            else:
+                print('selecione uma figura')
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
 
-app = App(escala=5)
+app = App(escala=10)
 app.show()
