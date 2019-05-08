@@ -428,23 +428,35 @@ class App(tk.Tk):
                 p2 = self.formas[z+1]
                 
                 self.limpa_buffer()
-                
+
                 p1_list = list(map(lambda p: [p[0],p[1]],p1.coords))[:-1] # adiciona 'z' e 'h'
                 p2_list = list(map(lambda p: [p[0],p[1]],p2.coords))[:-1] # adiciona 'z' e 'h'
                 coords_novo = list(map(lambda p: (round(p[0]),round(p[1])), algoritmos.Sutherland_Hodgman(p1_list,len(p1_list),p2_list,len(p2_list))))
 
-                for i in range(0,len(coords_novo),2):
+                '''for i in range(0,len(coords_novo),2):
                     if len(coords_novo[i:i+2])==2:
                         p1_aux, p2_aux = coords_novo[i:i+2]
                         linha = Poligono(p1_aux,p2_aux)
                     else:
                         p1_aux = coords_novo[i]
                         linha = Poligono(p1_aux)
-                #for p_aux in coords_novo:
-                #    linha = Poligono(p_aux)'''
                     for x,y in linha.borda():
                         self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_coord(linha.borda())
+                    self.pinta_coord(linha.borda())'''
+                '''for ponto in coords_novo:
+                    linha = Poligono(ponto)
+                    for x,y in linha.borda():
+                        self.add_frame_buffer(x,y,self.cor)
+                    self.pinta_coord(linha.borda())'''
+                linha = Poligono(coords_novo[0])
+                for ponto in coords_novo[1:]:
+                    linha.coords.append(ponto)
+                linha.coords.append(linha.coords[0])
+                for x,y in linha.borda():
+                    self.add_frame_buffer(x,y,self.cor)
+                self.pinta_coord(linha.borda())
+                
+
             else:
                 print('selecione uma figura')
         # substitui evento modo de pintura atual
