@@ -10,10 +10,11 @@ class App(tk.Tk):
     w_bt = 10 # largura dos botões
     frame_buffer_aux = [] # frame_buffer auxiliar
     forma_aux = None
+    pivo = None
     formas = []
     def __init__(self, escala=10, largura=600, altura=700, titulo='CG-2019.2'):
         super().__init__()
-        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN, CORTE_LINHA, TRANSLAD
+        # MODOS = LIVRE, LINHA, CIRCULO, BEZIER, PREE_REC, PREE_SCAN, CORTE_LINHA, TRANSLA, ROTAC
         self.title(titulo)
         self.escala = escala
         self.altura = altura//escala # quantidade de linhas (y)
@@ -22,7 +23,7 @@ class App(tk.Tk):
         self.canvas = None
         self.frame_buffer = None
         self.lista_box = None
-        self.entrada_xy = None
+        self.entrada_xy = dict() # x,y,ang
         self.cor = '#000000'
         self.modo = 'LINHA' # modo inicial
 
@@ -31,6 +32,7 @@ class App(tk.Tk):
         self.frame_buffer = [['#ffffff' for x in range(self.largura)] for y in range(self.altura)]
         self.forma_aux = None
         self.pinta_buffer()
+        self.pivo = None
 
     def show(self):
         self.canvas = self.cria_canvas() # cria canvas na tela do app
@@ -58,12 +60,14 @@ class App(tk.Tk):
         self.canvas.bind('<Motion>',motion_mouse) # executa ao mover mouse sobre o canvas
         self.canvas.bind('<Leave>',leave_mouse) # executa ao retirar o mouse do canvas
         # lista formas
-        tk.Label(frame_ferramenta,text='Polígonos:').pack()
-        self.lista_box = tk.Listbox(frame_ferramenta,w=self.w_bt,height=6)
+        label_frame = tk.LabelFrame(frame_ferramenta)
+        label_frame.pack()
+        #tk.Label(frame_ferramenta,text='Polígonos:').pack()
+        tk.Label(label_frame,text='Polígonos:').pack()
+        self.lista_box = tk.Listbox(label_frame,w=self.w_bt,height=6)
         self.lista_box.pack()
-
-        bt_add = tk.Button(frame_ferramenta,text='+',command=self.add_forma,width=self.w_bt//2)
-        bt_rm = tk.Button(frame_ferramenta,text='-',command=self.rm_forma,width=self.w_bt//2)
+        bt_add = tk.Button(label_frame,text='+',command=self.add_forma,width=self.w_bt//2)
+        bt_rm = tk.Button(label_frame,text='-',command=self.rm_forma,width=self.w_bt//2)
         self.lista_box.bind('<Double-Button-1>',lambda e: self.pinta_forma())
 
         bt_add.pack()
@@ -100,14 +104,24 @@ class App(tk.Tk):
         botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
         botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
         botoes.append(tk.LabelFrame(pai))
+        botoes.append(tk.LabelFrame(pai))
 
-        conj_translacao = botoes[-1]
-        tk.Button(conj_translacao,text='Translação',command=lambda: self.muda_opcao('TRANSLAD'),width=w_bt-1).pack()
+
+        # ADICIONAL PARA ROTOAÇÃO
+        conj_rotacao = botoes[-1]
+        tk.Button(conj_rotacao,text='Rotação',command=lambda: self.muda_opcao('ROTAC'),width=w_bt-1).pack()
+        tk.Label(conj_rotacao,text=' Grau ( 0º ) ').pack()
+        frame_aux = tk.Frame(conj_rotacao)
+        frame_aux.pack()
+        self.entrada_xy['ang'] = tk.StringVar()
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['ang']).grid(row=0,column=0)
+
+        # ADICIONAL PARA TRANSLAÇÃO
+        conj_translacao = botoes[-2]
+        tk.Button(conj_translacao,text='Translação',command=lambda: self.muda_opcao('TRANSLA'),width=w_bt-1).pack()
         tk.Label(conj_translacao,text=' (  X  ,  Y  ) ').pack()
-        
         frame_aux = tk.Frame(conj_translacao)
         frame_aux.pack()
-        self.entrada_xy = dict()
         self.entrada_xy['x'] = tk.StringVar()
         self.entrada_xy['y'] = tk.StringVar()
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['x']).grid(row=0,column=0)
@@ -300,14 +314,41 @@ class App(tk.Tk):
                     else:
                         print('selecione uma figura')
             f_event = f
-        elif modo=='TRANSLAD':
+        elif modo=='TRANSLA':
             index =  self.lista_box.curselection()
             if index:
                 index = index[0]
                 linha = self.formas[index]
-                self.limpa_buffer()
+                #self.limpa_buffer()
+                coord_antiga = linha.borda()
+                for x,y in coord_antiga:
+                    self.add_frame_buffer(x,y,'#ffffff')
+                self.pinta_coord(coord_antiga)
                 ponto_t = int(self.entrada_xy['x'].get()),int(self.entrada_xy['y'].get())
                 linha.coords = algoritmos.translate(linha,ponto_t)
+                for x,y in linha.borda():
+                    self.add_frame_buffer(x,y,self.cor)
+                self.pinta_coord(linha.borda())
+            else:
+                print('selecione uma figura')
+        elif modo=='ROTAC':
+            def f(event):
+                x,y = self.xyscala(event.x,event.y) # captura x e y do canvas e converte de acordo com nossa escala
+                self.pivo = (x,y) # realiza instância de uma Linha com a coordenada inicial
+                self.marca_pixel(x,y)
+            f_event = f
+            index =  self.lista_box.curselection()
+            if index:
+                index = index[0]
+                linha = self.formas[index]
+                #self.limpa_buffer()
+                coord_antiga = linha.borda()
+                for x,y in coord_antiga:
+                    self.add_frame_buffer(x,y,'#ffffff')
+                self.pinta_coord(coord_antiga)
+                
+                grau_rotacao = int(self.entrada_xy['ang'].get())
+                linha.coords = algoritmos.rotate(linha,grau_rotacao, self.pivo if self.pivo else (0,0))
                 for x,y in linha.borda():
                     self.add_frame_buffer(x,y,self.cor)
                 self.pinta_coord(linha.borda())

@@ -6,10 +6,17 @@ def translate(figura, ponto_t):
         pontos[i] = (x+tx,y+ty)
     return pontos
 
-'''def rotate(points, rotationDegree):
-  degreeCos = math.cos(math.radians(rotationDegree))
-  degreeSin = math.sin(math.radians(rotationDegree))
-  return list(Point(point.x * degreeCos - point.y * degreeSin, point.y * degreeCos + point.x * degreeSin) for point in points)'''
+def rotate(figura, grau_rotacao,pivo=(0,0)):
+    import math
+    x_pivo,y_pivo = pivo
+    grau_cos = math.cos(math.radians(grau_rotacao)) # cos do grau
+    grau_sen = math.sin(math.radians(grau_rotacao)) # sen do grau
+    novas_coords = list()
+    for x,y in figura.coords:
+        x_ = x_pivo + round((x-x_pivo)*grau_cos - (y-y_pivo)*grau_sen)
+        y_ = y_pivo + round((y-y_pivo)*grau_cos + (x-x_pivo)*grau_sen)
+        novas_coords.append((x_,y_))
+    return novas_coords
 
 '''def scale(points, scaleFactor):
   return list(Point(point.x,  point.y) * scaleFactor for point in points)'''
