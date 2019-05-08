@@ -105,19 +105,10 @@ class App(tk.Tk):
         botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
         botoes.append(tk.LabelFrame(pai))
         botoes.append(tk.LabelFrame(pai))
-
-
-        # ADICIONAL PARA ROTOAÇÃO
-        conj_rotacao = botoes[-1]
-        tk.Button(conj_rotacao,text='Rotação',command=lambda: self.muda_opcao('ROTAC'),width=w_bt-1).pack()
-        tk.Label(conj_rotacao,text=' Grau ( 0º ) ').pack()
-        frame_aux = tk.Frame(conj_rotacao)
-        frame_aux.pack()
-        self.entrada_xy['ang'] = tk.StringVar()
-        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['ang']).grid(row=0,column=0)
+        botoes.append(tk.LabelFrame(pai))
 
         # ADICIONAL PARA TRANSLAÇÃO
-        conj_translacao = botoes[-2]
+        conj_translacao = botoes[-3]
         tk.Button(conj_translacao,text='Translação',command=lambda: self.muda_opcao('TRANSLA'),width=w_bt-1).pack()
         tk.Label(conj_translacao,text=' (  X  ,  Y  ) ').pack()
         frame_aux = tk.Frame(conj_translacao)
@@ -126,6 +117,26 @@ class App(tk.Tk):
         self.entrada_xy['y'] = tk.StringVar()
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['x']).grid(row=0,column=0)
         tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['y']).grid(row=0,column=1)
+
+        # ADICIONAL PARA ROTOAÇÃO
+        conj_rotacao = botoes[-2]
+        tk.Button(conj_rotacao,text='Rotação',command=lambda: self.muda_opcao('ROTAC'),width=w_bt-1).pack()
+        tk.Label(conj_rotacao,text=' Grau ( 0º ) ').pack()
+        frame_aux = tk.Frame(conj_rotacao)
+        frame_aux.pack()
+        self.entrada_xy['ang'] = tk.StringVar()
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['ang']).grid(row=0,column=0)
+
+        # ADICIONAL ESCALA
+        conj_escala = botoes[-1]
+        tk.Button(conj_escala,text='Escala',command=lambda: self.muda_opcao('ESCALA'),width=w_bt-1).pack()
+        tk.Label(conj_escala,text=' (  X  ,  Y  ) ').pack()
+        frame_aux = tk.Frame(conj_escala)
+        frame_aux.pack()
+        self.entrada_xy['x_escala'] = tk.StringVar()
+        self.entrada_xy['y_escala'] = tk.StringVar()
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['x_escala']).grid(row=0,column=0)
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['y_escala']).grid(row=0,column=1)
 
         for botao in botoes:
             botao.pack()
@@ -349,6 +360,24 @@ class App(tk.Tk):
                 
                 grau_rotacao = int(self.entrada_xy['ang'].get())
                 linha.coords = algoritmos.rotate(linha,grau_rotacao, self.pivo if self.pivo else (0,0))
+                for x,y in linha.borda():
+                    self.add_frame_buffer(x,y,self.cor)
+                self.pinta_coord(linha.borda())
+            else:
+                print('selecione uma figura')
+        elif modo=='ESCALA':
+            #x_escala'
+            index =  self.lista_box.curselection()
+            if index:
+                index = index[0]
+                linha = self.formas[index]
+                #self.limpa_buffer()
+                coord_antiga = linha.borda()
+                for x,y in coord_antiga:
+                    self.add_frame_buffer(x,y,'#ffffff')
+                self.pinta_coord(coord_antiga)
+                ponto_t = float(self.entrada_xy['x_escala'].get()),float(self.entrada_xy['y_escala'].get())
+                linha.coords = algoritmos.scale(linha,ponto_t)
                 for x,y in linha.borda():
                     self.add_frame_buffer(x,y,self.cor)
                 self.pinta_coord(linha.borda())

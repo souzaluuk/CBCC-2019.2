@@ -18,9 +18,17 @@ def rotate(figura, grau_rotacao,pivo=(0,0)):
         novas_coords.append((x_,y_))
     return novas_coords
 
-'''def scale(points, scaleFactor):
-  return list(Point(point.x,  point.y) * scaleFactor for point in points)'''
-
+def scale(figura, escala):
+    coords = figura.coords
+    escala_x,escala_y = escala
+    min_x = min(coords,key=lambda ponto: ponto[0])[0]
+    min_y = min(coords,key=lambda ponto: ponto[1])[1]
+    novas_coords = list()
+    for x,y in coords:
+        x_ = min_x + ((x - min_x) * escala_x) if x!=0 else x
+        y_ = min_x + ((y - min_y) * escala_y) if y!=0 else y
+        novas_coords.append((round(x_),round(y_)))
+    return novas_coords
 
 def cohen_Sutherland(pontos_linha, p_min:tuple, p_max:tuple):
     dentro_janela = 0  # 0000
