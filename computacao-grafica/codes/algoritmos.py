@@ -1,21 +1,10 @@
-def translate(pontos, ponto_t):
+def translate(figura, ponto_t):
     tx,ty = ponto_t
+    pontos = list(figura.coords)
     for i in range(len(pontos)):
         x,y = pontos[i]
-        print((x,y),'->',ponto_t,':',(x-tx,y-ty))
         pontos[i] = (x+tx,y+ty)
     return pontos
-
-'''
-import algoritmos
-from elementos import Poligono
-linha = Poligono((0,0),(0,0))
-algoritmos.translate(linha.vertices,(10,10))
-linha = Poligono((10,10),(10,101))
-algoritmos.translate(linha.vertices,(10,10))
-linha = Poligono((20,20),(20,20))
-algoritmos.translate(linha.vertices,(10,10))
-'''
 
 '''def rotate(points, rotationDegree):
   degreeCos = math.cos(math.radians(rotationDegree))
@@ -26,14 +15,14 @@ algoritmos.translate(linha.vertices,(10,10))
   return list(Point(point.x,  point.y) * scaleFactor for point in points)'''
 
 
-def cohen_Sutherland(linha, p_min:tuple, p_max:tuple):
+def cohen_Sutherland(pontos_linha, p_min:tuple, p_max:tuple):
     dentro_janela = 0  # 0000
     esquerda_janela = 1  # 0001
     direita_janela = 2  # 0010
     baixo_janela = 4  # 0100
     cima_janela = 8  # 1000
 
-    p1,p2 = linha
+    p1,p2 = pontos_linha
     
     x1, y1 = p1
     x2, y2 = p2
@@ -140,11 +129,11 @@ def preenchscanline(fb,poligono,cor):
                         pass
                         #scanlines[y].append(x)
                     else:
-                        if (x,y) in poligono.vertices:
-                            index = poligono.vertices.index((x,y))
-                            conjunto_teste = poligono.vertices[index-1:index+2]
+                        if (x,y) in poligono.coords:
+                            index = poligono.coords.index((x,y))
+                            conjunto_teste = poligono.coords[index-1:index+2]
                             if conjunto_teste:
-                                if max(conjunto_teste,key=lambda p:p[1]) == poligono.vertices[index] or min(conjunto_teste,key=lambda p:p[1]) == poligono.vertices[index]:
+                                if max(conjunto_teste,key=lambda p:p[1]) == poligono.coords[index] or min(conjunto_teste,key=lambda p:p[1]) == poligono.coords[index]:
                                     scanlines[y].pop(-1)
     for y in scanlines:
         linhas = scanlines[y]
@@ -196,10 +185,9 @@ def curva(controlPT,passo):
         t+=passo
     return coord
 
-def circulo(ponto_centro:tuple,ponto_raio:tuple):
+def circulo(ponto_centro:tuple,raio:tuple):
     x1,y1 = ponto_centro # centro do circulo
-    x2,y2 = ponto_raio # ponto que será base para o raio
-    raio = round(((x2-x1)**2 + (y2-y1)**2)**0.5) # arrendondamento da distância entre os dois pontos
+    raio = raio
     coords = [] # lista para guardar as coordenadas iniciais
     x,y = (0,raio) # ponto de partida na construção o círculo (deslocado para o centro)
     p = 1 - raio

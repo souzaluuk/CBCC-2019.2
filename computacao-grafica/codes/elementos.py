@@ -6,32 +6,33 @@ class Ponto:
         self.y=y
 
 class Curva:
-    def __init__(self,*pontos,cor_borda=None,cor_interna=None,fechado=False):
-        self.pontos = list(pontos)
+    def __init__(self,*ponto_controle,cor_borda=None,fechado=False):
+        self.coords = list(ponto_controle)
         self.fechado = fechado
     def borda(self):
-        return algoritmos.curva(self.pontos,0.0001)
+        return algoritmos.curva(self.coords,0.0001)
 
 class Circulo:
-    def __init__(self,centro:tuple,raio:tuple,cor_borda=None,cor_interna=None,fechado=True):
-        self.centro = centro
-        self.raio = raio
-        self.cor_borda=cor_borda
-        self.cor_interna=cor_interna
-        self.fechado = fechado
-    def borda(self):
-        return algoritmos.circulo(self.centro,self.raio)
-
-class Poligono:
-    def __init__(self,*pontos,cor_borda=None,cor_interna=None,fechado=False):
-        self.vertices = list(pontos)
+    def __init__(self,centro,raio:tuple,cor_borda=None,fechado=True):
+        self.coords = [centro]
+        x1,y1 = centro # centro do circulo
+        x2,y2 = raio # ponto que será base para o raio
+        self.raio = round(((x2-x1)**2 + (y2-y1)**2)**0.5) # arrendondamento da distância entre os dois pontos
         self.cor_borda = cor_borda
         self.fechado = fechado
     def borda(self):
-        if len(self.vertices)==1:
-            return self.vertices
+        return algoritmos.circulo(self.coords[0],self.raio)
+
+class Poligono:
+    def __init__(self,*coords,cor_borda=None,fechado=False):
+        self.coords = list(coords)
+        self.cor_borda = cor_borda
+        self.fechado = fechado
+    def borda(self):
+        if len(self.coords)==1:
+            return self.coords
         else:
-            v = self.vertices
+            v = self.coords
             borda = []
             for i in range(len(v)-1):
                 borda.extend(algoritmos.bresenham(v[i],v[i+1]))

@@ -7,7 +7,7 @@ from elementos import *
 # `pacman -S tk`
 #
 class App(tk.Tk):
-    w_bt = 8 # largura dos botões
+    w_bt = 10 # largura dos botões
     frame_buffer_aux = [] # frame_buffer auxiliar
     forma_aux = None
     formas = []
@@ -22,6 +22,7 @@ class App(tk.Tk):
         self.canvas = None
         self.frame_buffer = None
         self.lista_box = None
+        self.entrada_xy = None
         self.cor = '#000000'
         self.modo = 'LINHA' # modo inicial
 
@@ -45,18 +46,8 @@ class App(tk.Tk):
     def cria_ferramentas(self):
         frame_ferramenta = tk.Frame(self) # frame para adicionar auxiliares ao Canvas
         frame_ferramenta.grid(row=0,column=1) # organiza ao lado do canvas (mesma linha, coluna 1)
-        # lista de formas
-        self.lista_box = tk.Listbox(frame_ferramenta,w=self.w_bt)
-        self.lista_box.pack()
-
-        bt_add = tk.Button(frame_ferramenta,text='+',command=self.add_forma,width=self.w_bt//2)
-        bt_rm = tk.Button(frame_ferramenta,text='-',command=self.rm_forma,width=self.w_bt//2)
-        self.lista_box.bind('<Double-Button-1>',lambda e: self.pinta_forma())
-
-        bt_add.pack()
-        bt_rm.pack()
         # eventos para label_ponto
-        label_ponto = tk.Label(frame_ferramenta,text='(00,00)')
+        label_ponto = tk.Label(frame_ferramenta,text='(00,00)',height=2)
         label_ponto.pack()
         def motion_mouse(event):
             x,y = self.xyscala(event.x,event.y)
@@ -66,6 +57,17 @@ class App(tk.Tk):
         def leave_mouse(event): label_ponto['text']='(00,00)'
         self.canvas.bind('<Motion>',motion_mouse) # executa ao mover mouse sobre o canvas
         self.canvas.bind('<Leave>',leave_mouse) # executa ao retirar o mouse do canvas
+        # lista formas
+        tk.Label(frame_ferramenta,text='Polígonos:').pack()
+        self.lista_box = tk.Listbox(frame_ferramenta,w=self.w_bt,height=6)
+        self.lista_box.pack()
+
+        bt_add = tk.Button(frame_ferramenta,text='+',command=self.add_forma,width=self.w_bt//2)
+        bt_rm = tk.Button(frame_ferramenta,text='-',command=self.rm_forma,width=self.w_bt//2)
+        self.lista_box.bind('<Double-Button-1>',lambda e: self.pinta_forma())
+
+        bt_add.pack()
+        bt_rm.pack()
         label_cor = tk.Label(frame_ferramenta,bg=self.cor,width=self.w_bt) # instância do label
         # evento para mudança de cor
         def muda_cor(event):
@@ -88,17 +90,29 @@ class App(tk.Tk):
 
     def cria_botoes_modos(self,pai):
         w_bt = self.w_bt
-        botoes = [
-            tk.Button(pai,text='Limpar',command=self.limpa_buffer,width=w_bt),
-            #tk.Button(pai,text='Livre',command=lambda: self.muda_opcao('LIVRE'),width=w_bt),
-            tk.Button(pai,text='Linha',command=lambda: self.muda_opcao('LINHA'),width=w_bt),
-            tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt),
-            tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt),
-            tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt),
-            tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt),
-            tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt),
-            tk.Button(pai,text='Translação',command=lambda: self.muda_opcao('TRANSLAD'),width=w_bt)
-        ]
+        botoes = list()
+        botoes.append(tk.Button(pai,text='Limpar',command=self.limpa_buffer,width=w_bt))
+        #botoes.append(tk.Button(pai,text='Livre',command=lambda: self.muda_opcao('LIVRE'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Linha',command=lambda: self.muda_opcao('LINHA'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
+        botoes.append(tk.LabelFrame(pai))
+
+        conj_translacao = botoes[-1]
+        tk.Button(conj_translacao,text='Translação',command=lambda: self.muda_opcao('TRANSLAD'),width=w_bt-1).pack()
+        tk.Label(conj_translacao,text=' (  X  ,  Y  ) ').pack()
+        
+        frame_aux = tk.Frame(conj_translacao)
+        frame_aux.pack()
+        self.entrada_xy = dict()
+        self.entrada_xy['x'] = tk.StringVar()
+        self.entrada_xy['y'] = tk.StringVar()
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['x']).grid(row=0,column=0)
+        tk.Entry(frame_aux,width=w_bt//2,textvariable=self.entrada_xy['y']).grid(row=0,column=1)
+
         for botao in botoes:
             botao.pack()
         return botoes
@@ -207,12 +221,12 @@ class App(tk.Tk):
                     self.forma_aux = Poligono((x,y)) # realiza instância de uma Linha com a coordenada inicial
                     self.add_frame_buffer(x,y,self.cor) # adiciona cor ao pixel no frame buffer
                     self.pinta_coord([(x,y)]) # pinta no Canvas a coordenada informada
-                elif (x,y) != self.forma_aux.vertices[-1]: # se o último vértice for diferente do novo clicado
-                    for x,y in bresenham(self.forma_aux.vertices[-1],(x,y)):
+                elif (x,y) != self.forma_aux.coords[-1]: # se o último vértice for diferente do novo clicado
+                    for x,y in bresenham(self.forma_aux.coords[-1],(x,y)):
                         self.add_frame_buffer(x,y,self.cor) # adiciona cor ao pixel no frame buffer
-                    self.pinta_coord(bresenham(self.forma_aux.vertices[-1],(x,y)))
-                    self.forma_aux.vertices.append((x,y)) # adiciona vértice à linha
-                if len(self.forma_aux.vertices)>1 and self.forma_aux.vertices[0] == self.forma_aux.vertices[-1]:
+                    self.pinta_coord(bresenham(self.forma_aux.coords[-1],(x,y)))
+                    self.forma_aux.coords.append((x,y)) # adiciona vértice à linha
+                if len(self.forma_aux.coords)>1 and self.forma_aux.coords[0] == self.forma_aux.coords[-1]:
                     self.forma_aux.fechado = True
                     self.add_forma() # adiciona e reseta self.forma_aux
             f_event = f
@@ -220,9 +234,11 @@ class App(tk.Tk):
             def f(event):
                 x,y = self.xyscala(event.x,event.y) # converte de acordo com escala
                 if not self.forma_aux:
-                    self.forma_aux = Circulo((x,y),None)
+                    #self.forma_aux = Circulo((x,y),None)
+                    self.forma_aux = Poligono((x,y))
                 else:
-                    self.forma_aux.raio = (x,y)
+                    #self.forma_aux.raio = (x,y)
+                    self.forma_aux = Circulo(self.forma_aux.coords[0],(x,y))
                     self.forma_aux.cor_borda = self.cor
                     for x,y in self.forma_aux.borda():
                         self.add_frame_buffer(x,y,self.forma_aux.cor_borda)
@@ -236,10 +252,10 @@ class App(tk.Tk):
                 if not self.forma_aux:
                     self.forma_aux = Curva((x,y))
                 else:
-                    self.forma_aux.pontos.append((x,y))
+                    self.forma_aux.coords.append((x,y))
 
-                if len(self.forma_aux.pontos)>1 and self.forma_aux.pontos[-2]==self.forma_aux.pontos[-1]:
-                    self.forma_aux.pontos.pop(-1)
+                if len(self.forma_aux.coords)>1 and self.forma_aux.coords[-2]==self.forma_aux.coords[-1]:
+                    self.forma_aux.coords.pop(-1)
                     self.forma_aux.cor_borda = self.cor
                     for x,y in self.forma_aux.borda():
                         self.add_frame_buffer(x,y,self.forma_aux.cor_borda)
@@ -267,9 +283,9 @@ class App(tk.Tk):
                 if not self.forma_aux: # se a forma auxiliar for None (Nula)
                     self.forma_aux = Poligono((x,y)) # realiza instância de uma Linha com a coordenada inicial
                 else:
-                    self.forma_aux.vertices.append((x,y))
-                    self.forma_aux.vertices.sort()
-                    p_min,p_max = self.forma_aux.vertices
+                    self.forma_aux.coords.append((x,y))
+                    self.forma_aux.coords.sort()
+                    p_min,p_max = self.forma_aux.coords
                     self.forma_aux = None
                     index =  self.lista_box.curselection()
                     if index:
@@ -277,7 +293,7 @@ class App(tk.Tk):
                         linha = self.formas[index]
                         self.limpa_buffer()
                         nova_linha = Poligono(None)
-                        nova_linha.vertices = algoritmos.cohen_Sutherland(linha.vertices,p_min,p_max)
+                        nova_linha.coords = algoritmos.cohen_Sutherland(linha.coords,p_min,p_max)
                         for x,y in nova_linha.borda():
                             self.add_frame_buffer(x,y,self.cor)
                         self.pinta_buffer()
@@ -285,26 +301,21 @@ class App(tk.Tk):
                         print('selecione uma figura')
             f_event = f
         elif modo=='TRANSLAD':
-            def f(event):
-                x,y = self.xyscala(event.x,event.y) # captura x e y do canvas e converte de acordo com nossa escala
-                
-                index =  self.lista_box.curselection()
-                if index:
-                    index = index[0]
-                    linha = self.formas[index]
-                    self.limpa_buffer()
-                    linha.vertices = algoritmos.translate(linha.vertices,(x,y))
-                    print(linha.vertices)
-                    for x,y in linha.borda():
-                        self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_buffer()
-                else:
-                    print('selecione uma figura')
-                
-            f_event = f
+            index =  self.lista_box.curselection()
+            if index:
+                index = index[0]
+                linha = self.formas[index]
+                self.limpa_buffer()
+                ponto_t = int(self.entrada_xy['x'].get()),int(self.entrada_xy['y'].get())
+                linha.coords = algoritmos.translate(linha,ponto_t)
+                for x,y in linha.borda():
+                    self.add_frame_buffer(x,y,self.cor)
+                self.pinta_coord(linha.borda())
+            else:
+                print('selecione uma figura')
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
 
-app = App(escala=10)
+app = App(escala=5)
 app.show()
