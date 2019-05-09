@@ -62,16 +62,16 @@ class App(tk.Tk):
         # lista formas
         label_frame = tk.LabelFrame(frame_ferramenta)
         label_frame.pack()
-        #tk.Label(frame_ferramenta,text='Polígonos:').pack()
         tk.Label(label_frame,text='Polígonos:').pack()
-        self.lista_box = tk.Listbox(label_frame,w=self.w_bt,height=3)
+        self.lista_box = tk.Listbox(label_frame,w=self.w_bt,height=2)
         self.lista_box.pack()
-        bt_add = tk.Button(label_frame,text='+',command=self.add_forma,width=self.w_bt//2)
-        bt_rm = tk.Button(label_frame,text='-',command=self.rm_forma,width=self.w_bt//2)
+        sub_frame = tk.Frame(label_frame)
+        sub_frame.pack()
+        bt_add = tk.Button(sub_frame,text='+',command=self.add_forma,width=self.w_bt//3)
+        bt_rm = tk.Button(sub_frame,text='-',command=self.rm_forma,width=self.w_bt//3)
         self.lista_box.bind('<Double-Button-1>',lambda e: self.pinta_forma())
-
-        bt_add.pack()
-        bt_rm.pack()
+        bt_add.grid(row=0,column=0)
+        bt_rm.grid(row=0,column=1)
         label_cor = tk.Label(frame_ferramenta,bg=self.cor,width=self.w_bt) # instância do label
         # evento para mudança de cor
         def muda_cor(event):
@@ -101,7 +101,7 @@ class App(tk.Tk):
         botoes.append(tk.Button(pai,text='Círculo',command=lambda: self.muda_opcao('CIRCULO'),width=w_bt))
         botoes.append(tk.Button(pai,text='Bezier',command=lambda: self.muda_opcao('BEZIER'),width=w_bt))
         botoes.append(tk.Button(pai,text='Pre. Rec',command=lambda: self.muda_opcao('PREE_REC'),width=w_bt))
-        #botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
+        botoes.append(tk.Button(pai,text='Pre. Scan',command=lambda: self.muda_opcao('PREE_SCAN'),width=w_bt))
         botoes.append(tk.Button(pai,text='Corte Linha',command=lambda: self.muda_opcao('CORTE_LINHA'),width=w_bt))
         botoes.append(tk.Button(pai,text='Corte Poligono',command=lambda: self.muda_opcao('CORTE_POLI'),width=w_bt))
         botoes.append(tk.LabelFrame(pai)) # frame translação
@@ -143,7 +143,7 @@ class App(tk.Tk):
         # ADICIONAL PROJEÇÃO PERSPECTIVA
         conj_perspe = botoes[-1]
         tk.Button(conj_perspe,text='Proj. Pers.',command=lambda: self.muda_opcao('PERSPEC'),width=w_bt-1).pack()
-        tk.Label(conj_escala,text='   D      Z   ').pack()
+        tk.Label(conj_perspe,text='D').pack()
         frame_aux = tk.Frame(conj_perspe)
         frame_aux.pack()
         self.entrada_xy['D'] = tk.StringVar()
@@ -433,21 +433,6 @@ class App(tk.Tk):
                 p2_list = list(map(lambda p: [p[0],p[1]],p2.coords))[:-1] # adiciona 'z' e 'h'
                 coords_novo = list(map(lambda p: (round(p[0]),round(p[1])), algoritmos.Sutherland_Hodgman(p1_list,len(p1_list),p2_list,len(p2_list))))
 
-                '''for i in range(0,len(coords_novo),2):
-                    if len(coords_novo[i:i+2])==2:
-                        p1_aux, p2_aux = coords_novo[i:i+2]
-                        linha = Poligono(p1_aux,p2_aux)
-                    else:
-                        p1_aux = coords_novo[i]
-                        linha = Poligono(p1_aux)
-                    for x,y in linha.borda():
-                        self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_coord(linha.borda())'''
-                '''for ponto in coords_novo:
-                    linha = Poligono(ponto)
-                    for x,y in linha.borda():
-                        self.add_frame_buffer(x,y,self.cor)
-                    self.pinta_coord(linha.borda())'''
                 linha = Poligono(coords_novo[0])
                 for ponto in coords_novo[1:]:
                     linha.coords.append(ponto)
@@ -455,13 +440,11 @@ class App(tk.Tk):
                 for x,y in linha.borda():
                     self.add_frame_buffer(x,y,self.cor)
                 self.pinta_coord(linha.borda())
-                
-
             else:
                 print('selecione uma figura')
         # substitui evento modo de pintura atual
         self.canvas.unbind('<Button-1>')
         self.canvas.bind('<Button-1>',f_event)
 
-app = App(escala=10)
+app = App(escala=5)
 app.show()

@@ -232,7 +232,11 @@ def curva(controlPT,passo):
         if not (round(xfim),round(yfim)) in coord:
             coord.append((round(xfim),round(yfim)))
         t+=passo
-    return coord
+    #from functools import reduce
+    coord_fim = list()
+    for p1,p2 in zip(coord,coord[1:]):
+        coord_fim.extend(bresenham(p1,p2))
+    return coord_fim
 
 def circulo(ponto_centro:tuple,raio:tuple):
     x1,y1 = ponto_centro # centro do circulo

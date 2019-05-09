@@ -10,7 +10,7 @@ class Curva:
         self.coords = list(ponto_controle)
         self.fechado = fechado
     def borda(self):
-        return algoritmos.curva(self.coords,0.0001)
+        return algoritmos.curva(self.coords,0.001)
 
 class Circulo:
     def __init__(self,centro,raio:tuple,cor_borda=None,fechado=True):
