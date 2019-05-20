@@ -31,9 +31,10 @@ O programa se divide em três arquivos distintos:
 
 ### Executando
 Os arquivos do programa econtram-se em [codes](codes) e bastam estar no mesmo diretório para seu funcionamento. Além disso, para início da aplicação, deve-se executar:
-```
+```bash
 $ python3 app.py
 ```
+** `No manjaro, necessário executar: sudo pacman -S tk`
 ### Exemplo
 
 ![Exemplo app](exemplo_app.png)
