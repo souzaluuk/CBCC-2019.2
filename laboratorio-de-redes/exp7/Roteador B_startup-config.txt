@@ -1,0 +1,93 @@
+!
+version 12.2
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Router
+!
+!
+!
+!
+ip dhcp excluded-address 192.168.3.250 192.168.3.254
+ip dhcp excluded-address 192.168.4.250 192.168.4.254
+ip dhcp excluded-address 192.168.5.250 192.168.5.254
+!
+ip dhcp pool Rede3
+ network 192.168.3.0 255.255.255.0
+ default-router 192.168.3.254
+ip dhcp pool Rede4
+ network 192.168.4.0 255.255.255.0
+ default-router 192.168.4.254
+ip dhcp pool Rede5
+ network 192.168.5.0 255.255.255.0
+ default-router 192.168.5.254
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet3/0
+ ip address 192.168.3.254 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet4/0
+ ip address 192.168.4.254 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet5/0
+ ip address 192.168.5.254 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface Serial6/0
+ no ip address
+ shutdown
+!
+router rip
+ network 192.168.3.0
+ network 192.168.4.0
+ network 192.168.5.0
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+
