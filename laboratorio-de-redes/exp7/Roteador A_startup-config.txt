@@ -4,9 +4,11 @@ no service timestamps log datetime msec
 no service timestamps debug datetime msec
 no service password-encryption
 !
-hostname Router
+hostname RouterA
 !
 !
+!
+enable password 12345a
 !
 !
 ip dhcp excluded-address 192.168.0.250 192.168.0.254
@@ -61,8 +63,8 @@ interface GigabitEthernet2/0
  speed auto
 !
 interface Serial3/0
- no ip address
- shutdown
+ ip address 200.239.64.1 255.255.255.0
+ clock rate 148000
 !
 router rip
  network 192.168.0.0
@@ -84,7 +86,10 @@ line con 0
 !
 line aux 0
 !
-line vty 0 4
+line vty 0
+ password 12345a
+ login
+line vty 1 4
  login
 !
 !
